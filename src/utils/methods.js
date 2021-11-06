@@ -9,6 +9,7 @@ import {
   BsCloudLightning,
   BsCloudLightningRain,
 } from 'react-icons/bs';
+import palette from './palette';
 
 // 온도 단위를 kelvin에서 celsius로 변환 및 소수점을 1개로 고정
 export const kelToCel = (kelvin) => (kelvin - 273.15).toFixed(1);
@@ -70,6 +71,23 @@ export const toIcon = (id) => {
       return <BsCloud />;
     case /804/.test(id):
       return <BsClouds />;
+    default:
+      return null;
+  }
+};
+
+// 날씨 id에 맞는 색상을 반환
+export const toColor = (id) => {
+  switch (true) {
+    case /[2356]\d\d/.test(id):
+      return palette.sky[400];
+    case /7\d\d/.test(id):
+    case /80[4]/.test(id):
+      return palette.sky[300];
+    case /80[23]/.test(id):
+      return palette.sky[200];
+    case /80[01]/.test(id):
+      return palette.sky[100];
     default:
       return null;
   }

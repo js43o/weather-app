@@ -14,10 +14,15 @@ const getWeatherAPI = async (city) => {
     return {
       responseCurrent: response[0].data,
       responseForcase: response[1].data,
+      error: null,
     };
   } catch (e) {
     alert('No search results.');
-    return { error: e.message };
+    return {
+      responseCurrent: null,
+      responseForcase: null,
+      error: e,
+    };
   }
 };
 

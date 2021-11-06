@@ -25,7 +25,13 @@ const NoCities = styled.div`
   height: 100%;
 `;
 
-const WeatherSide = ({ cities, onAddCity, onSelectCity, onRemoveCity }) => {
+const WeatherSide = ({
+  currentCity,
+  cities,
+  onAddCity,
+  onSelectCity,
+  onRemoveCity,
+}) => {
   return (
     <WeatherSideBlock>
       <WeatherInput onAddCity={onAddCity} />
@@ -37,6 +43,7 @@ const WeatherSide = ({ cities, onAddCity, onSelectCity, onRemoveCity }) => {
               city={city}
               onSelectCity={onSelectCity}
               onRemoveCity={onRemoveCity}
+              isSelected={currentCity.name === city.name}
             />
           ))}
         </WeatherList>
@@ -47,4 +54,4 @@ const WeatherSide = ({ cities, onAddCity, onSelectCity, onRemoveCity }) => {
   );
 };
 
-export default WeatherSide;
+export default React.memo(WeatherSide);

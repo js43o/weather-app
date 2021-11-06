@@ -15,6 +15,7 @@ export const initialState = {
     },
   },
   currentCity: null,
+  error: false,
 };
 
 const reducer = (state, action) => {
@@ -23,6 +24,13 @@ const reducer = (state, action) => {
       return {
         ...state,
         loading: true,
+        error: null,
+      };
+    case 'ERROR':
+      return {
+        ...state,
+        loading: false,
+        error: action.error,
       };
     case 'ADD_CITY':
       return {
@@ -39,10 +47,10 @@ const reducer = (state, action) => {
     case 'REMOVE_CITY':
       return {
         ...state,
-        cities: state.cities.filter((city) => city.name !== action.name),
+        cities: state.cities.filter((city) => city.name !== action.city.name),
         currentCity:
           state.currentCity.name === action.city.name
-            ? null
+            ? action.adjacentCity
             : state.currentCity,
       };
     default:

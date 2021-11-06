@@ -1,14 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
 import * as utils from '../utils/methods';
+import palette from '../utils/palette';
 
 const WeatherItemBlock = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 0.5rem;
-  border: 1px solid #cccccc;
+  border: 1px solid
+    ${(props) => (props.isSelected ? palette.bluegrey[300] : palette.grey[200])};
   border-radius: 0.25rem;
   margin-top: 0.5rem;
+  margin-right: 1rem;
   &:active {
     opacity: 0.5;
   }
@@ -32,15 +35,31 @@ const IconBlock = styled.div`
   font-size: 2rem;
 `;
 
-const WeatherItem = ({ city, onSelectCity }) => {
+const WeatherItem = ({ city, isSelected, onSelectCity, onRemoveCity }) => {
   const name = city.name;
   const { id, tempMin, tempMax } = city.weather;
+
   const onClick = () => {
     onSelectCity(city);
   };
 
+  const onPointerDown = () => {
+    const timerId = setTimeout(() => {
+      // eslint-disable-next-line
+      const isRemove = confirm('삭제하시겠습니까?');
+      if (isRemove) onRemoveCity(city);
+    }, 500);
+    document.onpointerup = () => {
+      clearTimeout(timerId);
+    };
+  };
+
   return (
-    <WeatherItemBlock onClick={onClick}>
+    <WeatherItemBlock
+      isSelected={isSelected}
+      onClick={onClick}
+      onPointerDown={onPointerDown}
+    >
       <InfoBlock>
         <div className="name">{name}</div>
         <div className="temp">
@@ -53,4 +72,4 @@ const WeatherItem = ({ city, onSelectCity }) => {
   );
 };
 
-export default WeatherItem;
+export default React.memo(WeatherItem);

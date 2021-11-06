@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { MdOutlineAdd } from 'react-icons/md';
+import palette from '../utils/palette';
 
 const WeatherInputBlock = styled.div`
   form {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    border: 1px solid #cccccc;
+    border: 1px solid ${palette.grey[200]};
     border-radius: 0.25rem;
     overflow: hidden;
     margin-bottom: 1rem;
@@ -16,7 +17,7 @@ const WeatherInputBlock = styled.div`
       border: none;
       outline: none;
       padding: 0 0.5rem;
-      background: #eeeeee;
+      background: ${palette.grey[200]};
       transition: background 0.25s;
       &:focus {
         background: white;
@@ -31,6 +32,9 @@ const WeatherInputBlock = styled.div`
       border-radius: 0 0.25rem 0.25rem 0;
       background: white;
       font-size: 1.25rem;
+      &:active {
+        color: #cccccc;
+      }
     }
   }
 `;
@@ -67,4 +71,4 @@ const WeatherInput = ({ onAddCity }) => {
   );
 };
 
-export default WeatherInput;
+export default React.memo(WeatherInput);
