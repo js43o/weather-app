@@ -14,6 +14,20 @@ import palette from './palette';
 // 온도 단위를 kelvin에서 celsius로 변환 및 소수점을 1개로 고정
 export const kelToCel = (kelvin) => (kelvin - 273.15).toFixed(1);
 
+// dt_txt 형식에서 date 및 time 추출
+export const dtTxtToDateAndTime = (dt_txt) => ({
+  date: {
+    year: dt_txt.match(/\d{4}/g)[0],
+    month: dt_txt.match(/\d{2}/g)[2],
+    day: dt_txt.match(/\d{2}/g)[3],
+  },
+  time: {
+    hour: dt_txt.match(/\d{2}/g)[4],
+    minute: dt_txt.match(/\d{2}/g)[5],
+    second: dt_txt.match(/\d{2}/g)[6],
+  },
+});
+
 // 대소문자 casing 변환
 export const toCasing = (str) =>
   str ? [str[0].toUpperCase(), str.slice(1).toLowerCase()].join('') : null;

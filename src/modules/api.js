@@ -2,28 +2,36 @@ import axios from 'axios';
 
 const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 
-const getWeatherAPI = async (city) => {
+const processPromise = async (promise) => {
   try {
-    const promiseCurrent = axios.get(
-      `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`,
-    );
-    const promiseForecast = axios.get(
-      `http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}`,
-    );
-    const response = await Promise.all([promiseCurrent, promiseForecast]);
+    const response = await promise;
     return {
-      responseCurrent: response[0].data,
-      responseForcase: response[1].data,
+      data: response.data,
       error: null,
     };
   } catch (e) {
     alert('No search results.');
     return {
-      responseCurrent: null,
-      responseForcase: null,
+      data: null,
       error: e,
     };
   }
 };
 
-export default getWeatherAPI;
+export const getWeatherCurrent = async (city) => {
+  const result = await processPromise(
+    axios.get(
+      `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`,
+    ),
+  );
+  return result;
+};
+
+export const getWeatherForecast = async (city) => {
+  const result = await processPromise(
+    axios.get(
+      `http://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}`,
+    ),
+  );
+  return result;
+};

@@ -7,13 +7,13 @@ const WeatherInputBlock = styled.div`
   form {
     display: flex;
     justify-content: space-between;
-    width: 100%;
     border: 1px solid ${palette.grey[200]};
     border-radius: 0.25rem;
     overflow: hidden;
     margin-bottom: 1rem;
     input {
       flex-grow: 1;
+      width: 100%;
       border: none;
       outline: none;
       padding: 0 0.5rem;
@@ -27,6 +27,7 @@ const WeatherInputBlock = styled.div`
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-shrink: 0;
       padding: 0.5rem;
       border: none;
       border-radius: 0 0.25rem 0.25rem 0;

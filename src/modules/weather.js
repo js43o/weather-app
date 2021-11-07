@@ -13,6 +13,7 @@ export const initialState = {
       windSpeed: null,
       windDeg: null,
     },
+    forecast: [],
   },
   currentCity: null,
   error: false,

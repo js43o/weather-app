@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import * as utils from '../utils/methods';
 import palette from '../utils/palette';
 
-const WeatherItemBlock = styled.div`
+const WeatherItemBlock = styled.li`
   display: flex;
   justify-content: space-between;
   padding: 0.5rem;

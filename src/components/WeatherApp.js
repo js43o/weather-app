@@ -1,6 +1,6 @@
 import React, { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
-import getWeatherAPI from '../modules/api';
+import { getWeatherCurrent, getWeatherForecast } from '../modules/api';
 import reducer, { initialState } from './../modules/weather';
 import WeatherMain from './WeatherMain';
 import WeatherSide from './WeatherSide';
@@ -8,6 +8,7 @@ import * as utils from '../utils/methods';
 
 const WeatherAppBlock = styled.div`
   display: flex;
+  justify-content: center;
   height: 100%;
   padding: 1rem;
 `;
@@ -21,28 +22,50 @@ const WeatherApp = () => {
       if (state.cities.find((city) => city.name === cityName)) return; // 이미 해당 도시가 존재함
 
       dispatch({ type: 'LOADING' });
-      const { responseCurrent, error } = await getWeatherAPI(cityName);
+      const { data: currentData, error: currentError } =
+        await getWeatherCurrent(cityName);
+      const { data: forecastData, error: forecastError } =
+        await getWeatherForecast(cityName);
 
-      if (!responseCurrent && error) {
-        dispatch({ type: 'ERROR', error });
+      if (!currentData && currentError) {
+        dispatch({ type: 'ERROR', currentError });
         return;
       }
 
+      if (!forecastData && forecastError) {
+        dispatch({ type: 'ERROR', forecastError });
+        return;
+      }
+
+      const forecast = forecastData.list.map((item) => ({
+        dt_txt: item.dt_txt,
+        date: utils.dtTxtToDateAndTime(item.dt_txt).date,
+        time: utils.dtTxtToDateAndTime(item.dt_txt).time,
+        id: item.weather[0].id,
+        temp: item.main.temp,
+        humidity: item.main.humidity,
+        windSpeed: item.wind.speed,
+        windDeg: item.wind.deg,
+      }));
+
+      const city = {
+        name: cityName,
+        weather: {
+          id: currentData.weather[0].id,
+          tempCurrent: utils.kelToCel(currentData.main.temp),
+          tempMin: utils.kelToCel(currentData.main.temp_min),
+          tempMax: utils.kelToCel(currentData.main.temp_max),
+          humidity: currentData.main.humidity,
+          pressure: currentData.main.pressure,
+          windSpeed: currentData.wind.speed,
+          windDeg: currentData.wind.deg,
+        },
+        forecast,
+      };
+
       dispatch({
         type: 'ADD_CITY',
-        city: {
-          name: cityName,
-          weather: {
-            id: responseCurrent.weather[0].id,
-            tempCurrent: utils.kelToCel(responseCurrent.main.temp),
-            tempMin: utils.kelToCel(responseCurrent.main.temp_min),
-            tempMax: utils.kelToCel(responseCurrent.main.temp_max),
-            humidity: responseCurrent.main.humidity,
-            pressure: responseCurrent.main.pressure,
-            windSpeed: responseCurrent.wind.speed,
-            windDeg: responseCurrent.wind.deg,
-          },
-        },
+        city,
       });
     },
     [state.cities],

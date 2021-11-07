@@ -6,7 +6,7 @@ import WeatherItem from './WeatherItem';
 const WeatherSideBlock = styled.div`
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  width: 30%;
   height: 100%;
   margin-left: 1rem;
 `;
