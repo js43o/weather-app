@@ -10,7 +10,6 @@ const processPromise = async (promise) => {
       error: null,
     };
   } catch (e) {
-    alert('No search results.');
     return {
       data: null,
       error: e,

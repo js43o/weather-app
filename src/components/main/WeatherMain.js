@@ -1,15 +1,17 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import * as utils from '../utils/methods';
-import palette from './../utils/palette';
+import * as utils from '../../utils/methods';
+import palette from '../../utils/palette';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { ImArrowUp } from 'react-icons/im';
+import WeatherMainForecast from './WeatherCarousel';
 
 const WeatherMainBlock = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-grow: 2;
   width: 65%;
   position: relative;
   border: 1px solid ${palette.grey[500]};
@@ -65,35 +67,10 @@ const SubInfoItemBlock = styled.div`
   & + & {
     border-left: 1px solid ${palette.grey[100]};
   }
-  div:first-child {
-    font-weight: bold;
-  }
   div:last-child {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-`;
-
-const ForecastListBlock = styled.ul`
-  display: flex;
-  width: 80%;
-  overflow-x: scroll;
-`;
-
-const ForecastItemBlock = styled.li`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  flex-basis: 8rem;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  max-width: 100%;
-  font-size: 1rem;
-  .icon {
-    font-size: 2rem;
   }
 `;
 
@@ -133,39 +110,28 @@ const WeatherMain = ({ loading, city }) => {
         <div className="city">{city.name}</div>
         <div className="icon">{utils.toIcon(city.weather.id)}</div>
         <div className="temp">{city.weather.tempCurrent} ℃</div>
-        <div className="description">
+        <div className="description kor">
           {utils.toDescription(city.weather.id)}
         </div>
       </MainInfoBlock>
       <SubInfoBlock>
         <SubInfoItemBlock>
-          <div>습도</div>
+          <div className="kor">습도</div>
           <div>{city.weather.humidity} %</div>
         </SubInfoItemBlock>
         <SubInfoItemBlock>
-          <div>바람</div>
+          <div className="kor">바람</div>
           <div>
             <WindArrow deg={city.weather.windDeg} />
             {city.weather.windSpeed} m/s
           </div>
         </SubInfoItemBlock>
         <SubInfoItemBlock>
-          <div>기압</div>
+          <div className="kor">기압</div>
           <div>{city.weather.pressure} hPa</div>
         </SubInfoItemBlock>
       </SubInfoBlock>
-      <ForecastListBlock>
-        {city.forecast.map((item) => (
-          <ForecastItemBlock key={item.dt_txt}>
-            <div className="date">
-              {item.date.day}일 {item.time.hour}시
-            </div>
-            <div className="icon">{utils.toIcon(item.id)}</div>
-            <div className="temp">{utils.kelToCel(item.temp)} ℃</div>
-            <div className="description">{utils.toDescription(item.id)}</div>
-          </ForecastItemBlock>
-        ))}
-      </ForecastListBlock>
+      <WeatherMainForecast city={city} />
     </WeatherMainBlock>
   );
 };

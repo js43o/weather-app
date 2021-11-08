@@ -32,6 +32,10 @@ export const dtTxtToDateAndTime = (dt_txt) => ({
 export const toCasing = (str) =>
   str ? [str[0].toUpperCase(), str.slice(1).toLowerCase()].join('') : null;
 
+// 최솟값과 최댓값 사이의 값으로 변환
+export const cutRange = (number, min, max) =>
+  Math.max(Math.min(number, max), min);
+
 // 날씨 id를 description으로 변환
 export const toDescription = (id) => {
   switch (true) {

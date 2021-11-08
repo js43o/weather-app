@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { MdOutlineAdd } from 'react-icons/md';
-import palette from '../utils/palette';
+import palette from '../../utils/palette';
 
 const WeatherInputBlock = styled.div`
   form {

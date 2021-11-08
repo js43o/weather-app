@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import * as utils from '../utils/methods';
-import palette from '../utils/palette';
+import * as utils from '../../utils/methods';
+import palette from '../../utils/palette';
 
 const WeatherItemBlock = styled.li`
   display: flex;
@@ -12,6 +12,9 @@ const WeatherItemBlock = styled.li`
   border-radius: 0.25rem;
   margin-top: 0.5rem;
   margin-right: 1rem;
+  &:hover {
+    opacity: 0.75;
+  }
   &:active {
     opacity: 0.5;
   }

@@ -2,8 +2,8 @@ import React, { useCallback, useReducer } from 'react';
 import styled from 'styled-components';
 import { getWeatherCurrent, getWeatherForecast } from '../modules/api';
 import reducer, { initialState } from './../modules/weather';
-import WeatherMain from './WeatherMain';
-import WeatherSide from './WeatherSide';
+import WeatherMain from './main/WeatherMain';
+import WeatherSide from './side/WeatherSide';
 import * as utils from '../utils/methods';
 
 const WeatherAppBlock = styled.div`
@@ -27,13 +27,9 @@ const WeatherApp = () => {
       const { data: forecastData, error: forecastError } =
         await getWeatherForecast(cityName);
 
-      if (!currentData && currentError) {
-        dispatch({ type: 'ERROR', currentError });
-        return;
-      }
-
-      if (!forecastData && forecastError) {
-        dispatch({ type: 'ERROR', forecastError });
+      if (currentError || forecastError) {
+        dispatch({ type: 'ERROR', error: { currentError, forecastError } });
+        alert('No search results.');
         return;
       }
 
