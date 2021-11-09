@@ -5,29 +5,27 @@ import palette from '../../utils/palette';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { ImArrowUp } from 'react-icons/im';
 import WeatherMainForecast from './WeatherCarousel';
+import flex from '../../utils/styles';
 
 const WeatherMainBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  ${flex('column')};
   flex-grow: 2;
   width: 65%;
   position: relative;
-  border: 1px solid ${palette.grey[500]};
+  border: 1px solid ${palette.grey[400]};
   border-radius: 0.25rem;
   background: ${(props) => props.color};
   color: ${(props) => props.color && 'white'};
   font-size: 2rem;
   transition: background 0.5s;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const MainInfoBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 2rem;
+  ${flex('column')};
+  margin-bottom: 1rem;
   .city {
     font-weight: bold;
   }
@@ -46,9 +44,7 @@ const MainInfoBlock = styled.div`
 `;
 
 const SubInfoBlock = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${flex('row')};
   width: 80%;
   padding: 0.5rem;
   border-radius: 0.5rem;
@@ -56,9 +52,7 @@ const SubInfoBlock = styled.div`
 `;
 
 const SubInfoItemBlock = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  ${flex('column')};
   flex-grow: 1;
   flex-basis: 1rem;
   align-items: center;
@@ -89,20 +83,21 @@ const WindArrow = styled(ImArrowUp)`
 `;
 
 const LoadingIndicator = styled(AiOutlineLoading)`
+  color: ${palette.lightblue[200]};
   font-size: 3rem;
   animation: ${rotateKeyframe} 0.5s infinite linear;
 `;
 
 const WeatherMain = ({ loading, city }) => {
-  if (!city) return <WeatherMainBlock>Select the city.</WeatherMainBlock>;
-
   if (loading)
     return (
-      <WeatherMainBlock color={utils.toColor(city.weather.id)}>
+      <WeatherMainBlock>
         <LoadingIndicator />
         Loading...
       </WeatherMainBlock>
     );
+
+  if (!city) return <WeatherMainBlock>Select the city.</WeatherMainBlock>;
 
   return (
     <WeatherMainBlock color={utils.toColor(city.weather.id)}>

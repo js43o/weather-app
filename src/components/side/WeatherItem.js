@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import * as utils from '../../utils/methods';
 import palette from '../../utils/palette';
+import flex from './../../utils/styles';
 
 const WeatherItemBlock = styled.li`
-  display: flex;
-  justify-content: space-between;
+  ${flex('row', 'space-between')}
   padding: 0.5rem;
   border: 1px solid
     ${(props) => (props.isSelected ? palette.bluegrey[300] : palette.grey[200])};
@@ -21,8 +21,7 @@ const WeatherItemBlock = styled.li`
 `;
 
 const InfoBlock = styled.div`
-  display: flex;
-  flex-direction: column;
+  ${flex('column', 'auto', 'auto')}
   .name {
     font-weight: bold;
   }
@@ -32,9 +31,7 @@ const InfoBlock = styled.div`
 `;
 
 const IconBlock = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${flex()}
   font-size: 2rem;
 `;
 

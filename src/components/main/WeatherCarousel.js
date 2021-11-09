@@ -2,25 +2,22 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import * as utils from '../../utils/methods';
 import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
+import flex from './../../utils/styles';
 
 const WeatherCarouselBlock = styled.div`
-  display: flex;
-  align-items: center;
+  ${flex()}
   position: relative;
   width: 80%;
   margin-top: 1rem;
 `;
 
 const CarouselListBlock = styled.ul`
-  display: flex;
+  ${flex('row', 'flex-start')}
   overflow-x: scroll;
 `;
 
 const CarouselItemBlock = styled.li`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  ${flex('column')}
   flex-shrink: 0;
   flex-basis: 8rem;
   padding: 0.5rem;
@@ -36,9 +33,7 @@ const CarouselItemBlock = styled.li`
 `;
 
 const ArrowBlock = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  ${flex()}
   right: ${(props) => (props.direction === 'prev' ? '' : 0)};
   height: 100%;
   padding: 1.5rem 0.5rem;

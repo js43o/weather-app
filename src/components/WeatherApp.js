@@ -8,7 +8,6 @@ import * as utils from '../utils/methods';
 
 const WeatherAppBlock = styled.div`
   display: flex;
-  justify-content: center;
   height: 100%;
   padding: 1rem;
 `;
@@ -19,7 +18,8 @@ const WeatherApp = () => {
   const onAddCity = useCallback(
     async (str) => {
       const cityName = utils.toCasing(str);
-      if (state.cities.find((city) => city.name === cityName)) return; // 이미 해당 도시가 존재함
+      if (!cityName || state.cities.find((city) => city.name === cityName))
+        return;
 
       dispatch({ type: 'LOADING' });
       const { data: currentData, error: currentError } =
@@ -44,18 +44,20 @@ const WeatherApp = () => {
         windDeg: item.wind.deg,
       }));
 
+      const current = {
+        id: currentData.weather[0].id,
+        tempCurrent: utils.kelToCel(currentData.main.temp),
+        tempMin: utils.kelToCel(currentData.main.temp_min),
+        tempMax: utils.kelToCel(currentData.main.temp_max),
+        humidity: currentData.main.humidity,
+        pressure: currentData.main.pressure,
+        windSpeed: currentData.wind.speed,
+        windDeg: currentData.wind.deg,
+      };
+
       const city = {
         name: cityName,
-        weather: {
-          id: currentData.weather[0].id,
-          tempCurrent: utils.kelToCel(currentData.main.temp),
-          tempMin: utils.kelToCel(currentData.main.temp_min),
-          tempMax: utils.kelToCel(currentData.main.temp_max),
-          humidity: currentData.main.humidity,
-          pressure: currentData.main.pressure,
-          windSpeed: currentData.wind.speed,
-          windDeg: currentData.wind.deg,
-        },
+        weather: current,
         forecast,
       };
 
