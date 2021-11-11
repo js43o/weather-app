@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { useCallback } from 'react/cjs/react.development';
-import styled from 'styled-components';
+import React, { useState, useCallback } from 'react';
 import WeatherInput from './WeatherInput';
 import WeatherItem from './WeatherItem';
+import styled from 'styled-components';
 import { MdOutlineSearch } from 'react-icons/md';
+import Button from '../../utils/button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
-import Button from '../../utils/button';
 
 const WeatherSideBlock = styled.div`
   ${flex('column', 'auto', 'auto')}
@@ -54,11 +53,13 @@ const SearchBlock = styled(Button)`
 `;
 
 const WeatherSide = ({
+  loading,
   currentCity,
   cities,
   onAddCity,
   onSelectCity,
   onRemoveCity,
+  onBookmarkCity,
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -70,16 +71,21 @@ const WeatherSide = ({
         <MdOutlineSearch />
       </SearchBlock>
       <WeatherSideBlock opened={open}>
-        <WeatherInput onAddCity={onAddCity} onToggleOpen={onToggleOpen} />
+        <WeatherInput
+          loading={loading}
+          onAddCity={onAddCity}
+          onToggleOpen={onToggleOpen}
+        />
         {cities.length ? (
           <WeatherList>
             {cities.map((city) => (
               <WeatherItem
                 key={city.name}
                 city={city}
+                isSelected={currentCity.name === city.name}
                 onSelectCity={onSelectCity}
                 onRemoveCity={onRemoveCity}
-                isSelected={currentCity.name === city.name}
+                onBookmarkCity={onBookmarkCity}
               />
             ))}
           </WeatherList>

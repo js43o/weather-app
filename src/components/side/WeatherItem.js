@@ -3,15 +3,22 @@ import styled from 'styled-components';
 import * as utils from '../../utils/methods';
 import palette from '../../utils/palette';
 import flex from './../../utils/styles';
+import { BsStar, BsStarFill } from 'react-icons/bs';
+import { FaTrashAlt } from 'react-icons/fa';
 
 const WeatherItemBlock = styled.li`
   ${flex('row', 'space-between')}
-  padding: 0.5rem;
   border: 1px solid
-    ${(props) => (props.isSelected ? palette.bluegrey[300] : palette.grey[200])};
+    ${(props) =>
+    props.isSelected ? palette.bluegrey[300] : palette.grey[200]};
   border-radius: 0.25rem;
   margin-top: 0.5rem;
-  margin-right: 1rem;
+`;
+
+const ContentsBlock = styled.div`
+  ${flex('row', 'space-between')}
+  flex-grow: 1;
+  padding: 0.5rem;
   &:hover {
     opacity: 0.75;
   }
@@ -35,39 +42,72 @@ const IconBlock = styled.div`
   font-size: 2rem;
 `;
 
-const WeatherItem = ({ city, isSelected, onSelectCity, onRemoveCity }) => {
-  const name = city.name;
-  const { id, tempMin, tempMax } = city.weather;
+const ConfigBlock = styled.div`
+  ${flex('column')}
+  height: 100%;
+  background: ${palette.grey[200]};
+`;
 
-  const onClick = () => {
-    onSelectCity(city);
-  };
+const BookmarkBlock = styled.div`
+  ${flex()}
+  flex-grow: 1;
+  padding: 0.5rem;
+  &:hover {
+    background: ${palette.yellow[400]};
+  }
+  &:active {
+    background: ${palette.yellow[600]};
+  }
+`;
 
-  const onPointerDown = () => {
-    const timerId = setTimeout(() => {
-      // eslint-disable-next-line
-      const isRemove = confirm('삭제하시겠습니까?');
-      if (isRemove) onRemoveCity(city);
-    }, 500);
-    document.onpointerup = () => {
-      clearTimeout(timerId);
-    };
-  };
+const RemovalBlock = styled.div`
+  ${flex()}
+  flex-grow: 1;
+  padding: 0.5rem;
+  &:hover {
+    background: ${palette.red[200]};
+  }
+  &:active {
+    background: ${palette.red[400]};
+  }
+`;
+
+const WeatherItem = ({
+  city,
+  isSelected,
+  isMarked,
+  onSelectCity,
+  onRemoveCity,
+  onBookmarkCity,
+}) => {
+  const {
+    name,
+    weather: {
+      id,
+      temp: { min, max },
+    },
+  } = city;
 
   return (
-    <WeatherItemBlock
-      isSelected={isSelected}
-      onClick={onClick}
-      onPointerDown={onPointerDown}
-    >
-      <InfoBlock>
-        <div className="name">{name}</div>
-        <div className="temp">
-          {tempMin} / {tempMax} ℃
-        </div>
-        <div className="id">{id && utils.toDescription(id)}</div>
-      </InfoBlock>
-      <IconBlock>{utils.toIcon(id)}</IconBlock>
+    <WeatherItemBlock isSelected={isSelected}>
+      <ContentsBlock onClick={() => onSelectCity(city)}>
+        <InfoBlock>
+          <div className="name">{name}</div>
+          <div className="temp">
+            {min} / {max} ℃
+          </div>
+          <div className="id">{id && utils.toDescription(id)}</div>
+        </InfoBlock>
+        <IconBlock>{utils.toIcon(id)}</IconBlock>
+      </ContentsBlock>
+      <ConfigBlock>
+        <BookmarkBlock onClick={() => onBookmarkCity(city)}>
+          {city.marked ? <BsStarFill /> : <BsStar />}
+        </BookmarkBlock>
+        <RemovalBlock onClick={() => onRemoveCity(city)}>
+          <FaTrashAlt />
+        </RemovalBlock>
+      </ConfigBlock>
     </WeatherItemBlock>
   );
 };

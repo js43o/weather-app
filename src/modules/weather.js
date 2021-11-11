@@ -1,22 +1,8 @@
 export const initialState = {
   loading: false,
-  cities: [],
-  city: {
-    name: '',
-    weather: {
-      id: null,
-      tempCurrent: null,
-      tempMin: null,
-      tempMax: null,
-      humidity: null,
-      pressure: null,
-      windSpeed: null,
-      windDeg: null,
-    },
-    forecast: [],
-  },
-  currentCity: null,
   error: false,
+  cities: [],
+  currentCity: null,
 };
 
 const reducer = (state, action) => {
@@ -53,6 +39,24 @@ const reducer = (state, action) => {
           state.currentCity.name === action.city.name
             ? action.adjacentCity
             : state.currentCity,
+      };
+    case 'BOOKMARK_CITY':
+      return {
+        ...state,
+        cities: state.cities.map((city) =>
+          city.name === action.city.name
+            ? {
+                ...city,
+                marked: !city.marked,
+              }
+            : city,
+        ),
+      };
+    case 'LOAD_CITIES':
+      return {
+        ...state,
+        cities: action.cities,
+        currentCity: action.cities[0],
       };
     default:
       return state;

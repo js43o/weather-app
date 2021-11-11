@@ -1,3 +1,4 @@
+import palette from './palette';
 import {
   BsSun,
   BsCloud,
@@ -9,7 +10,6 @@ import {
   BsCloudLightning,
   BsCloudLightningRain,
 } from 'react-icons/bs';
-import palette from './palette';
 
 // 온도 단위를 kelvin에서 celsius로 변환 및 소수점을 1개로 고정
 export const kelToCel = (kelvin) => (kelvin - 273.15).toFixed(1);

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import styled from 'styled-components';
-import * as utils from '../../utils/methods';
 import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
+import * as utils from '../../utils/methods';
 import flex from './../../utils/styles';
 
 const WeatherCarouselBlock = styled.div`
@@ -91,10 +91,10 @@ const WeatherCarousel = ({ city }) => {
         {city.forecast.map((item) => (
           <CarouselItemBlock key={item.dt_txt}>
             <div className="date kor">
-              {item.date.day}일 {item.time.hour}시
+              {item.dt.date.day}일 {item.dt.time.hour}시
             </div>
             <div className="icon">{utils.toIcon(item.id)}</div>
-            <div className="temp">{utils.kelToCel(item.temp)} ℃</div>
+            <div className="temp">{utils.kelToCel(item.temp.current)} ℃</div>
             <div className="description kor">
               {utils.toDescription(item.id)}
             </div>

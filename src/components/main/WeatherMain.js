@@ -1,16 +1,16 @@
 import React from 'react';
+import WeatherMainForecast from './WeatherCarousel';
 import styled, { keyframes } from 'styled-components';
-import * as utils from '../../utils/methods';
-import palette from '../../utils/palette';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { ImArrowUp } from 'react-icons/im';
-import WeatherMainForecast from './WeatherCarousel';
+import * as utils from '../../utils/methods';
+import palette from '../../utils/palette';
 import flex from '../../utils/styles';
 
 const WeatherMainBlock = styled.div`
   ${flex('column')};
   flex-grow: 2;
-  width: 65%;
+  width: 60%;
   position: relative;
   border: 1px solid ${palette.grey[400]};
   border-radius: 0.25rem;
@@ -68,6 +68,11 @@ const SubInfoItemBlock = styled.div`
   }
 `;
 
+const WindArrow = styled(ImArrowUp)`
+  margin-right: 0.25rem;
+  transform: rotate(${(props) => props.deg + 180 + 'deg'});
+`;
+
 const rotateKeyframe = keyframes`
   from {
     transform: rotate(0deg);
@@ -75,11 +80,6 @@ const rotateKeyframe = keyframes`
   to {
     transform: rotate(360deg);
   }
-`;
-
-const WindArrow = styled(ImArrowUp)`
-  margin-right: 0.25rem;
-  transform: rotate(${(props) => props.deg + 'deg'});
 `;
 
 const LoadingIndicator = styled(AiOutlineLoading)`
@@ -99,31 +99,40 @@ const WeatherMain = ({ loading, city }) => {
 
   if (!city) return <WeatherMainBlock>Select the city.</WeatherMainBlock>;
 
+  const {
+    name,
+    weather: {
+      id,
+      temp: { current },
+      humidity,
+      wind: { speed, deg },
+      pressure,
+    },
+  } = city;
+
   return (
-    <WeatherMainBlock color={utils.toColor(city.weather.id)}>
+    <WeatherMainBlock color={utils.toColor(id)}>
       <MainInfoBlock>
-        <div className="city">{city.name}</div>
-        <div className="icon">{utils.toIcon(city.weather.id)}</div>
-        <div className="temp">{city.weather.tempCurrent} ℃</div>
-        <div className="description kor">
-          {utils.toDescription(city.weather.id)}
-        </div>
+        <div className="city">{name}</div>
+        <div className="icon">{utils.toIcon(id)}</div>
+        <div className="temp">{current} ℃</div>
+        <div className="description kor">{utils.toDescription(id)}</div>
       </MainInfoBlock>
       <SubInfoBlock>
         <SubInfoItemBlock>
           <div className="kor">습도</div>
-          <div>{city.weather.humidity} %</div>
+          <div>{humidity} %</div>
         </SubInfoItemBlock>
         <SubInfoItemBlock>
           <div className="kor">바람</div>
           <div>
-            <WindArrow deg={city.weather.windDeg} />
-            {city.weather.windSpeed} m/s
+            <WindArrow deg={deg} />
+            {speed} m/s
           </div>
         </SubInfoItemBlock>
         <SubInfoItemBlock>
           <div className="kor">기압</div>
-          <div>{city.weather.pressure} hPa</div>
+          <div>{pressure} hPa</div>
         </SubInfoItemBlock>
       </SubInfoBlock>
       <WeatherMainForecast city={city} />
