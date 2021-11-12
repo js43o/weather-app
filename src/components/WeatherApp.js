@@ -99,6 +99,15 @@ const WeatherApp = () => {
     [state.cities],
   );
 
+  const onInsertCity = useCallback(
+    (city, toIndex) => {
+      let cities = state.cities.filter((item) => item.name !== city.name);
+      cities = [...cities.slice(0, toIndex), city, ...cities.slice(toIndex)];
+      dispatch({ type: 'SET_CITIES', cities });
+    },
+    [state.cities],
+  );
+
   const onBookmarkCity = useCallback((city) => {
     dispatch({
       type: 'BOOKMARK_CITY',
@@ -109,7 +118,7 @@ const WeatherApp = () => {
 
   useEffect(() => {
     const cities = JSON.parse(localStorage.getItem('marked_cities'));
-    dispatch({ type: 'LOAD_CITIES', cities });
+    dispatch({ type: 'SET_CITIES', cities });
   }, []);
 
   useEffect(() => {
@@ -130,6 +139,7 @@ const WeatherApp = () => {
         onSelectCity={onSelectCity}
         onRemoveCity={onRemoveCity}
         onBookmarkCity={onBookmarkCity}
+        onInsertCity={onInsertCity}
       />
     </WeatherAppBlock>
   );

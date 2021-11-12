@@ -1,18 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import * as utils from '../../utils/methods';
 import palette from '../../utils/palette';
 import flex from './../../utils/styles';
 import { BsStar, BsStarFill } from 'react-icons/bs';
 import { FaTrashAlt } from 'react-icons/fa';
+import * as utils from '../../utils/methods';
 
 const WeatherItemBlock = styled.li`
   ${flex('row', 'space-between')}
+  flex-shrink: 0;
   border: 1px solid
-    ${(props) =>
-    props.isSelected ? palette.bluegrey[300] : palette.grey[200]};
+    ${(props) => (props.isSelected ? palette.bluegrey[200] : palette.grey[200])};
   border-radius: 0.25rem;
-  margin-top: 0.5rem;
+  margin-top: 8px;
+  min-width: 12rem;
+  background: white;
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: none;
+  transform: none;
+  transition: transform 0.25s;
+  &.grabbed {
+    transform: scale(1.05);
+  }
 `;
 
 const ContentsBlock = styled.div`
@@ -75,10 +85,9 @@ const RemovalBlock = styled.div`
 const WeatherItem = ({
   city,
   isSelected,
-  isMarked,
-  onSelectCity,
   onRemoveCity,
   onBookmarkCity,
+  onPointerDown,
 }) => {
   const {
     name,
@@ -89,8 +98,8 @@ const WeatherItem = ({
   } = city;
 
   return (
-    <WeatherItemBlock isSelected={isSelected}>
-      <ContentsBlock onClick={() => onSelectCity(city)}>
+    <WeatherItemBlock className="block" isSelected={isSelected}>
+      <ContentsBlock onPointerDown={(e) => onPointerDown(e, city)}>
         <InfoBlock>
           <div className="name">{name}</div>
           <div className="temp">

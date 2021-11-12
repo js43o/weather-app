@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { MdOutlineAdd, MdOutlineClose } from 'react-icons/md';
 import Button from '../../utils/button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
+import { useRef } from 'react/cjs/react.development';
 
 const WeatherInputBlock = styled.div`
   ${flex('row')}
@@ -58,6 +59,7 @@ const CloseButton = styled(Button)`
 
 const WeatherInput = ({ loading, onAddCity, onToggleOpen }) => {
   const [input, setInput] = useState('');
+  const inputRef = useRef(null);
 
   const onChange = (e) => {
     setInput(e.target.value);
@@ -68,6 +70,10 @@ const WeatherInput = ({ loading, onAddCity, onToggleOpen }) => {
     onAddCity(input);
     setInput('');
   };
+
+  useEffect(() => {
+    if (!loading) inputRef.current.focus();
+  }, [loading]);
 
   return (
     <WeatherInputBlock>
@@ -80,6 +86,7 @@ const WeatherInput = ({ loading, onAddCity, onToggleOpen }) => {
           placeholder="Enter the city name"
           required
           disabled={loading}
+          ref={inputRef}
         />
         <SubmitButton type="submit">
           <MdOutlineAdd />

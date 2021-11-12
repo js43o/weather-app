@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import WeatherInput from './WeatherInput';
 import WeatherItem from './WeatherItem';
 import styled from 'styled-components';
@@ -6,6 +6,7 @@ import { MdOutlineSearch } from 'react-icons/md';
 import Button from '../../utils/button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
+import * as utils from '../../utils/methods';
 
 const WeatherSideBlock = styled.div`
   ${flex('column', 'auto', 'auto')}
@@ -60,10 +61,58 @@ const WeatherSide = ({
   onSelectCity,
   onRemoveCity,
   onBookmarkCity,
+  onInsertCity,
 }) => {
   const [open, setOpen] = useState(false);
+  const listRef = useRef(null);
 
   const onToggleOpen = useCallback(() => setOpen(!open), [open]);
+
+  const onPointerDown = (e_down, city) => {
+    // onHold event
+    let timerId = setTimeout(() => {
+      const item = e_down.target.closest('.block');
+      if (!item) return;
+
+      const shiftY = e_down.clientY - item.getBoundingClientRect().top;
+      const width = item.getBoundingClientRect().width;
+      const height = item.getBoundingClientRect().height + 8;
+      let y = e_down.clientY - shiftY - 8;
+
+      item.classList.add('grabbed');
+      item.style.position = 'fixed';
+      item.style.top = `${y}px`;
+      item.style.width = `${width}px`;
+
+      document.onpointermove = (e_move) => {
+        y = e_move.clientY - shiftY - 8;
+        item.style.top = `${y}px`;
+      };
+
+      document.onpointerup = () => {
+        const index = utils.cutRange(
+          Math.floor(y / height),
+          0,
+          cities.length - 1,
+        );
+
+        if (index !== cities.indexOf(city)) onInsertCity(city, index);
+
+        item.classList.remove('grabbed');
+        item.style.position = '';
+        item.style.top = '';
+        item.style.width = '';
+
+        document.onpointermove = null;
+        document.onpointerup = null;
+      };
+    }, 500);
+    // onClick event
+    document.onpointerup = () => {
+      clearTimeout(timerId);
+      onSelectCity(city);
+    };
+  };
 
   return (
     <>
@@ -76,8 +125,8 @@ const WeatherSide = ({
           onAddCity={onAddCity}
           onToggleOpen={onToggleOpen}
         />
-        {cities.length ? (
-          <WeatherList>
+        {cities ? (
+          <WeatherList ref={listRef}>
             {cities.map((city) => (
               <WeatherItem
                 key={city.name}
@@ -86,6 +135,7 @@ const WeatherSide = ({
                 onSelectCity={onSelectCity}
                 onRemoveCity={onRemoveCity}
                 onBookmarkCity={onBookmarkCity}
+                onPointerDown={onPointerDown}
               />
             ))}
           </WeatherList>

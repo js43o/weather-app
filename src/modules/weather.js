@@ -52,11 +52,11 @@ const reducer = (state, action) => {
             : city,
         ),
       };
-    case 'LOAD_CITIES':
+    case 'SET_CITIES':
       return {
         ...state,
         cities: action.cities,
-        currentCity: action.cities[0],
+        currentCity: state.currentCity || action.cities[0],
       };
     default:
       return state;
