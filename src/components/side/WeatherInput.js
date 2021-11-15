@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { MdOutlineAdd, MdOutlineClose } from 'react-icons/md';
-import Button from '../../utils/button';
+import Button from '../../lib/Button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
 import { useRef } from 'react/cjs/react.development';

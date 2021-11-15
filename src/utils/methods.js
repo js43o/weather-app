@@ -36,6 +36,19 @@ export const toCasing = (str) =>
 export const cutRange = (number, min, max) =>
   Math.max(Math.min(number, max), min);
 
+// 시간 값을 텍스트로 변환
+export const secToText = (sec) => {
+  if (!sec) return 'null';
+  const diff = Math.floor((Date.now() - sec) / 1000);
+
+  if (diff < 60) return `${diff}초 전`;
+  else if (diff < 60 * 60) return `${Math.floor(diff / 60)}분 전`;
+  else if (diff < 60 * 60 * 24) return `${Math.floor(diff / (60 * 60))}시간 전`;
+  else if (diff < 60 * 60 * 24 * 7)
+    return `${Math.floor(diff / (60 * 60 * 24))}일 전`;
+  else return `${new Date(sec).getMonth()}월 ${new Date(sec).getDate()}일`;
+};
+
 // 날씨 id를 description으로 변환
 export const toDescription = (id) => {
   switch (true) {

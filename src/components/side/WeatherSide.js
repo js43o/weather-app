@@ -3,7 +3,7 @@ import WeatherInput from './WeatherInput';
 import WeatherItem from './WeatherItem';
 import styled from 'styled-components';
 import { MdOutlineSearch } from 'react-icons/md';
-import Button from '../../utils/button';
+import Button from '../../lib/Button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
 import * as utils from '../../utils/methods';
@@ -60,7 +60,7 @@ const WeatherSide = ({
   onAddCity,
   onSelectCity,
   onRemoveCity,
-  onBookmarkCity,
+  onToggleMarkCity,
   onInsertCity,
 }) => {
   const [open, setOpen] = useState(false);
@@ -111,6 +111,7 @@ const WeatherSide = ({
     document.onpointerup = () => {
       clearTimeout(timerId);
       onSelectCity(city);
+      document.onpointerup = null;
     };
   };
 
@@ -131,10 +132,10 @@ const WeatherSide = ({
               <WeatherItem
                 key={city.name}
                 city={city}
-                isSelected={currentCity.name === city.name}
+                isSelected={currentCity && currentCity.name === city.name}
                 onSelectCity={onSelectCity}
                 onRemoveCity={onRemoveCity}
-                onBookmarkCity={onBookmarkCity}
+                onToggleMarkCity={onToggleMarkCity}
                 onPointerDown={onPointerDown}
               />
             ))}

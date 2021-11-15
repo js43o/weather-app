@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import palette from '../../utils/palette';
 import flex from './../../utils/styles';
@@ -13,6 +13,7 @@ const WeatherItemBlock = styled.li`
     ${(props) => (props.isSelected ? palette.bluegrey[200] : palette.grey[200])};
   border-radius: 0.25rem;
   margin-top: 8px;
+  margin-right: 1rem;
   min-width: 12rem;
   background: white;
   overflow: hidden;
@@ -86,7 +87,7 @@ const WeatherItem = ({
   city,
   isSelected,
   onRemoveCity,
-  onBookmarkCity,
+  onToggleMarkCity,
   onPointerDown,
 }) => {
   const {
@@ -110,7 +111,7 @@ const WeatherItem = ({
         <IconBlock>{utils.toIcon(id)}</IconBlock>
       </ContentsBlock>
       <ConfigBlock>
-        <BookmarkBlock onClick={() => onBookmarkCity(city)}>
+        <BookmarkBlock onClick={() => onToggleMarkCity(city)}>
           {city.marked ? <BsStarFill /> : <BsStar />}
         </BookmarkBlock>
         <RemovalBlock onClick={() => onRemoveCity(city)}>

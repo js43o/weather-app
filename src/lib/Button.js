@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import flex from './styles';
+import flex from '../utils/styles';
 
 const Button = styled.button`
   ${flex('row')}

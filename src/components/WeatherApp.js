@@ -15,63 +15,94 @@ const WeatherAppBlock = styled.div`
 const WeatherApp = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  const loadWeatherData = useCallback(async (name) => {
+    dispatch({ type: 'LOADING' });
+
+    const { data: currentData, error: currentError } = await getWeatherCurrent(
+      name,
+    );
+    const { data: forecastData, error: forecastError } =
+      await getWeatherForecast(name);
+
+    if (currentError || forecastError) {
+      dispatch({ type: 'ERROR', error: { currentError, forecastError } });
+      alert('No search results.');
+      return {
+        data: null,
+        error: { currentError, forecastError },
+      };
+    }
+
+    const weather = {
+      id: currentData.weather[0].id,
+      temp: {
+        current: utils.kelToCel(currentData.main.temp),
+        min: utils.kelToCel(currentData.main.temp_min),
+        max: utils.kelToCel(currentData.main.temp_max),
+      },
+      humidity: currentData.main.humidity,
+      wind: {
+        speed: currentData.wind.speed,
+        deg: currentData.wind.deg,
+      },
+      pressure: currentData.main.pressure,
+    };
+
+    const forecast = forecastData.list.map((item) => ({
+      dt_txt: item.dt_txt,
+      dt: utils.dtTxtToDateAndTime(item.dt_txt),
+      id: item.weather[0].id,
+      temp: {
+        current: item.main.temp,
+      },
+      humidity: item.main.humidity,
+      wind: {
+        speed: item.wind.speed,
+        deg: item.wind.deg,
+      },
+    }));
+
+    return { data: { weather, forecast }, error: null };
+  }, []);
+
   const onAddCity = useCallback(
     async (str) => {
       const name = utils.toCasing(str);
       if (!name || state.cities.find((city) => city.name === name)) return;
 
-      dispatch({ type: 'LOADING' });
-      const { data: currentData, error: currentError } =
-        await getWeatherCurrent(name);
-      const { data: forecastData, error: forecastError } =
-        await getWeatherForecast(name);
-
-      if (currentError || forecastError) {
-        dispatch({ type: 'ERROR', error: { currentError, forecastError } });
-        alert('No search results.');
-        return;
-      }
-
-      const weather = {
-        id: currentData.weather[0].id,
-        temp: {
-          current: utils.kelToCel(currentData.main.temp),
-          min: utils.kelToCel(currentData.main.temp_min),
-          max: utils.kelToCel(currentData.main.temp_max),
-        },
-        humidity: currentData.main.humidity,
-        wind: {
-          speed: currentData.wind.speed,
-          deg: currentData.wind.deg,
-        },
-        pressure: currentData.main.pressure,
-      };
-
-      const forecast = forecastData.list.map((item) => ({
-        dt_txt: item.dt_txt,
-        dt: utils.dtTxtToDateAndTime(item.dt_txt),
-        id: item.weather[0].id,
-        temp: {
-          current: item.main.temp,
-        },
-        humidity: item.main.humidity,
-        wind: {
-          speed: item.wind.speed,
-          deg: item.wind.deg,
-        },
-      }));
+      const { data, error } = await loadWeatherData(name);
+      if (!data && error) return;
 
       dispatch({
         type: 'ADD_CITY',
         city: {
           name,
-          weather,
-          forecast,
+          weather: data.weather,
+          forecast: data.forecast,
           marked: false,
+          recentUpdate: Date.now(),
         },
       });
     },
-    [state.cities],
+    [state.cities, loadWeatherData],
+  );
+
+  const onRefreshCity = useCallback(
+    async (city) => {
+      const { data, error } = await loadWeatherData(city.name);
+      if (!data && error) return;
+
+      dispatch({
+        type: 'SET_CITY',
+        city: {
+          ...city,
+          weather: data.weather,
+          forecast: data.forecast,
+          recentUpdate: Date.now(),
+        },
+      });
+    },
+    [loadWeatherData],
   );
 
   const onSelectCity = useCallback((city) => {
@@ -108,7 +139,7 @@ const WeatherApp = () => {
     [state.cities],
   );
 
-  const onBookmarkCity = useCallback((city) => {
+  const onToggleMarkCity = useCallback((city) => {
     dispatch({
       type: 'BOOKMARK_CITY',
       city,
@@ -130,7 +161,11 @@ const WeatherApp = () => {
 
   return (
     <WeatherAppBlock>
-      <WeatherMain loading={state.loading} city={state.currentCity} />
+      <WeatherMain
+        loading={state.loading}
+        city={state.currentCity}
+        onRefreshCity={onRefreshCity}
+      />
       <WeatherSide
         loading={state.loading}
         cities={state.cities}
@@ -138,7 +173,7 @@ const WeatherApp = () => {
         onAddCity={onAddCity}
         onSelectCity={onSelectCity}
         onRemoveCity={onRemoveCity}
-        onBookmarkCity={onBookmarkCity}
+        onToggleMarkCity={onToggleMarkCity}
         onInsertCity={onInsertCity}
       />
     </WeatherAppBlock>

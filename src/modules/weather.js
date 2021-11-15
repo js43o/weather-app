@@ -26,6 +26,16 @@ const reducer = (state, action) => {
         cities: state.cities.concat(action.city),
         currentCity: action.city,
       };
+    case 'SET_CITY': {
+      return {
+        ...state,
+        loading: false,
+        cities: state.cities.map((city) =>
+          city.name === action.city.name ? action.city : city,
+        ),
+        currentCity: action.city,
+      };
+    }
     case 'SELECT_CITY':
       return {
         ...state,

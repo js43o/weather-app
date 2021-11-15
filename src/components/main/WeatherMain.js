@@ -3,9 +3,11 @@ import WeatherMainForecast from './WeatherCarousel';
 import styled, { keyframes } from 'styled-components';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { ImArrowUp } from 'react-icons/im';
+import { MdRefresh } from 'react-icons/md';
 import * as utils from '../../utils/methods';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
+import { useEffect } from 'react/cjs/react.development';
 
 const WeatherMainBlock = styled.div`
   ${flex('column')};
@@ -18,6 +20,7 @@ const WeatherMainBlock = styled.div`
   color: ${(props) => props.color && 'white'};
   font-size: 2rem;
   transition: background 0.5s;
+  overflow-y: scroll;
   @media (max-width: 768px) {
     width: 100%;
   }
@@ -26,7 +29,13 @@ const WeatherMainBlock = styled.div`
 const MainInfoBlock = styled.div`
   ${flex('column')};
   margin-bottom: 1rem;
+  .recent {
+    ${flex()};
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
   .city {
+    ${flex()}
     font-weight: bold;
   }
   .icon {
@@ -88,7 +97,35 @@ const LoadingIndicator = styled(AiOutlineLoading)`
   animation: ${rotateKeyframe} 0.5s infinite linear;
 `;
 
-const WeatherMain = ({ loading, city }) => {
+const RefreshButton = styled(MdRefresh)`
+  margin-left: 0.25rem;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.25s;
+  &:hover {
+    opacity: 0.75;
+  }
+  &:active {
+    opacity: 0.5;
+    transform: rotate(180deg);
+  }
+`;
+
+const WeatherMain = ({ loading, city, onRefreshCity }) => {
+  useEffect(() => {
+    if (!city) return;
+    console.log('rerendering', city.recentUpdate);
+  });
+
+  useEffect(() => {
+    console.log('city is change');
+  }, [city]);
+
+  const onClick = () => {
+    onRefreshCity(city);
+  };
+
   if (loading)
     return (
       <WeatherMainBlock>
@@ -108,11 +145,16 @@ const WeatherMain = ({ loading, city }) => {
       wind: { speed, deg },
       pressure,
     },
+    recentUpdate,
   } = city;
 
   return (
     <WeatherMainBlock color={utils.toColor(id)}>
       <MainInfoBlock>
+        <div className="recent">
+          {utils.secToText(recentUpdate)}
+          <RefreshButton onClick={onClick} />
+        </div>
         <div className="city">{name}</div>
         <div className="icon">{utils.toIcon(id)}</div>
         <div className="temp">{current} ℃</div>
