@@ -1,3 +1,4 @@
+import React from 'react';
 import palette from './palette';
 import {
   BsSun,
@@ -12,32 +13,52 @@ import {
 } from 'react-icons/bs';
 
 // 온도 단위를 kelvin에서 celsius로 변환 및 소수점을 1개로 고정
-export const kelToCel = (kelvin) => (kelvin - 273.15).toFixed(1);
+export const kelToCel = (kelvin: number) => (kelvin - 273.15).toFixed(1);
 
 // dt_txt 형식에서 date 및 time 추출
-export const dtTxtToDateAndTime = (dt_txt) => ({
+export type dt = {
   date: {
-    year: dt_txt.match(/\d{4}/g)[0],
-    month: dt_txt.match(/\d{2}/g)[2],
-    day: dt_txt.match(/\d{2}/g)[3],
-  },
+    year: string;
+    month: string;
+    day: string;
+  };
   time: {
-    hour: dt_txt.match(/\d{2}/g)[4],
-    minute: dt_txt.match(/\d{2}/g)[5],
-    second: dt_txt.match(/\d{2}/g)[6],
-  },
-});
+    hour: string;
+    minute: string;
+    second: string;
+  };
+};
+export const dtTxtToDateAndTime = (dt_txt: string) => {
+  const matchFour = dt_txt.match(/\d{4}/g);
+  const matchTwo = dt_txt.match(/\d{2}/g);
+
+  if (!matchTwo || !matchFour) return null;
+
+  const res: dt = {
+    date: {
+      year: matchFour[0],
+      month: matchTwo[2],
+      day: matchTwo[3],
+    },
+    time: {
+      hour: matchTwo[4],
+      minute: matchTwo[5],
+      second: matchTwo[6],
+    },
+  };
+  return res;
+};
 
 // 대소문자 casing 변환
-export const toCasing = (str) =>
+export const toCasing = (str: string) =>
   str ? [str[0].toUpperCase(), str.slice(1).toLowerCase()].join('') : null;
 
 // 최솟값과 최댓값 사이의 값으로 변환
-export const cutRange = (number, min, max) =>
+export const cutRange = (number: number, min: number, max: number) =>
   Math.max(Math.min(number, max), min);
 
 // 시간 값을 텍스트로 변환
-export const secToText = (sec) => {
+export const secToText = (sec: number) => {
   if (!sec) return 'null';
   const diff = Math.floor((Date.now() - sec) / 1000);
 
@@ -50,7 +71,7 @@ export const secToText = (sec) => {
 };
 
 // 날씨 id를 description으로 변환
-export const toDescription = (id) => {
+export const toDescription = (id: string) => {
   switch (true) {
     case /2[12]\d/.test(id):
       return '낙뢰';
@@ -82,7 +103,7 @@ export const toDescription = (id) => {
 };
 
 // 날씨 id를 아이콘으로 변환
-export const toIcon = (id) => {
+export const toIcon = (id: string) => {
   switch (true) {
     case /2[12]\d/.test(id):
       return <BsCloudLightning />;
@@ -108,7 +129,7 @@ export const toIcon = (id) => {
 };
 
 // 날씨 id에 맞는 색상을 반환
-export const toColor = (id) => {
+export const toColor = (id: string) => {
   switch (true) {
     case /[2356]\d\d/.test(id):
       return palette.sky[400];
@@ -120,6 +141,6 @@ export const toColor = (id) => {
     case /80[01]/.test(id):
       return palette.sky[100];
     default:
-      return null;
+      return 'white';
   }
 };

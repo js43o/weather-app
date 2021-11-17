@@ -1,11 +1,74 @@
-export const initialState = {
+import { dt } from '../utils/methods';
+
+export type Weather = {
+  id: string;
+  temp: {
+    current: string;
+    min: string;
+    max: string;
+  };
+  humidity: number;
+  wind: {
+    speed: number;
+    deg: number;
+  };
+  pressure: number;
+};
+
+// { id: any; temp: { current: string; min: string; max: string; }; humidity: any; wind: { speed: any; deg: any; }; pressure: any; }
+
+export type Forecast = {
+  dt_txt: string;
+  dt: dt | null;
+  id: string;
+  temp: {
+    current: number;
+  };
+  humidity: number;
+  wind: {
+    speed: number;
+    deg: number;
+  };
+};
+
+export type City = {
+  name: string;
+  weather: Weather;
+  forecast: Forecast[];
+  marked: boolean;
+  recentUpdate: number;
+};
+
+type WeatherError = {
+  currentError: Error;
+  forecastError: Error;
+};
+
+type State = {
+  loading: boolean;
+  error: WeatherError | null;
+  cities: City[];
+  currentCity: City | null;
+};
+
+type Action =
+  | { type: 'LOADING' }
+  | { type: 'ERROR'; error: WeatherError }
+  | { type: 'ADD_CITY'; city: City }
+  | { type: 'SET_CITY'; city: City }
+  | { type: 'SELECT_CITY'; city: City }
+  | { type: 'REMOVE_CITY'; city: City; adjacentCity: City | null }
+  | { type: 'BOOKMARK_CITY'; city: City; marked: boolean }
+  | { type: 'SET_CITIES'; cities: City[] };
+
+export const initialState: State = {
   loading: false,
-  error: false,
+  error: null,
   cities: [],
   currentCity: null,
 };
 
-const reducer = (state, action) => {
+const reducer = (state: State, action: Action) => {
   switch (action.type) {
     case 'LOADING':
       return {
@@ -46,7 +109,7 @@ const reducer = (state, action) => {
         ...state,
         cities: state.cities.filter((city) => city.name !== action.city.name),
         currentCity:
-          state.currentCity.name === action.city.name
+          state.currentCity?.name === action.city.name
             ? action.adjacentCity
             : state.currentCity,
       };

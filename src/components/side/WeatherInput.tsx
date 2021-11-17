@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { MdOutlineAdd, MdOutlineClose } from 'react-icons/md';
 import Button from '../../lib/Button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
-import { useRef } from 'react/cjs/react.development';
 
 const WeatherInputBlock = styled.div`
   ${flex('row')}
@@ -57,22 +56,32 @@ const CloseButton = styled(Button)`
   }
 `;
 
-const WeatherInput = ({ loading, onAddCity, onToggleOpen }) => {
-  const [input, setInput] = useState('');
-  const inputRef = useRef(null);
+type WeatherInputProps = {
+  loading: boolean;
+  onAddCity: (str: string) => void;
+  onToggleOpen: () => void;
+};
 
-  const onChange = (e) => {
+const WeatherInput = ({
+  loading,
+  onAddCity,
+  onToggleOpen,
+}: WeatherInputProps) => {
+  const [input, setInput] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onAddCity(input);
     setInput('');
   };
 
   useEffect(() => {
-    if (!loading) inputRef.current.focus();
+    if (!loading && inputRef.current) inputRef.current.focus();
   }, [loading]);
 
   return (

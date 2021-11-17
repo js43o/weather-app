@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
 import palette from '../../utils/palette';
-import flex from './../../utils/styles';
+import flex from '../../utils/styles';
 import { BsStar, BsStarFill } from 'react-icons/bs';
 import { FaTrashAlt } from 'react-icons/fa';
 import * as utils from '../../utils/methods';
+import { City } from '../../modules/weather';
 
-const WeatherItemBlock = styled.li`
+const WeatherItemBlock = styled.li<{ isSelected: boolean }>`
   ${flex('row', 'space-between')}
   flex-shrink: 0;
   border: 1px solid
@@ -83,13 +84,22 @@ const RemovalBlock = styled.div`
   }
 `;
 
+type WeatherItemProps = {
+  city: City;
+  isSelected: boolean;
+  onSelectCity: (city: City) => void;
+  onRemoveCity: (city: City) => void;
+  onToggleMarkCity: (city: City) => void;
+  onPointerDown: (e: React.PointerEvent<HTMLDivElement>, city: City) => void;
+};
+
 const WeatherItem = ({
   city,
   isSelected,
   onRemoveCity,
   onToggleMarkCity,
   onPointerDown,
-}) => {
+}: WeatherItemProps) => {
   const {
     name,
     weather: {

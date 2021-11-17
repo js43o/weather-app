@@ -4,9 +4,12 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "module": "es6",
+    "strict": true,
     "jsx": "react",
     "target": "es5",
-    "allowJs": true
+    "allowJs": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true
   },
   "include": [
     "src"

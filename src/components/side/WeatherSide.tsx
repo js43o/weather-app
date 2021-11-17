@@ -7,8 +7,9 @@ import Button from '../../lib/Button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
 import * as utils from '../../utils/methods';
+import { City } from '../../modules/weather';
 
-const WeatherSideBlock = styled.div`
+const WeatherSideBlock = styled.div<{ opened: boolean }>`
   ${flex('column', 'auto', 'auto')}
   flex-grow: 1;
   width: 30%;
@@ -53,6 +54,17 @@ const SearchBlock = styled(Button)`
   }
 `;
 
+type WeatherSideProps = {
+  loading: boolean;
+  currentCity: City | null;
+  cities: City[];
+  onAddCity: (str: string) => Promise<void>;
+  onSelectCity: (city: City) => void;
+  onRemoveCity: (city: City) => void;
+  onInsertCity: (city: City, toIndex: number) => void;
+  onToggleMarkCity: (city: City) => void;
+};
+
 const WeatherSide = ({
   loading,
   currentCity,
@@ -60,19 +72,24 @@ const WeatherSide = ({
   onAddCity,
   onSelectCity,
   onRemoveCity,
-  onToggleMarkCity,
   onInsertCity,
-}) => {
+  onToggleMarkCity,
+}: WeatherSideProps) => {
   const [open, setOpen] = useState(false);
   const listRef = useRef(null);
 
   const onToggleOpen = useCallback(() => setOpen(!open), [open]);
 
-  const onPointerDown = (e_down, city) => {
+  const onPointerDown = (
+    e_down: React.PointerEvent<HTMLDivElement>,
+    city: City,
+  ) => {
     // onHold event
+    // eslint-disable-next-line
     let timerId = setTimeout(() => {
-      const item = e_down.target.closest('.block');
-      if (!item) return;
+      const target = e_down.target as HTMLDivElement;
+      const item = target.closest('.block');
+      if (!(item instanceof HTMLLIElement)) return;
 
       const shiftY = e_down.clientY - item.getBoundingClientRect().top;
       const width = item.getBoundingClientRect().width;
@@ -132,7 +149,9 @@ const WeatherSide = ({
               <WeatherItem
                 key={city.name}
                 city={city}
-                isSelected={currentCity && currentCity.name === city.name}
+                isSelected={
+                  currentCity ? currentCity.name === city.name : false
+                }
                 onSelectCity={onSelectCity}
                 onRemoveCity={onRemoveCity}
                 onToggleMarkCity={onToggleMarkCity}

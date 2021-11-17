@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import styled from 'styled-components';
 import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
 import * as utils from '../../utils/methods';
-import flex from './../../utils/styles';
+import flex from '../../utils/styles';
+import { City } from '../../modules/weather';
 
 const WeatherCarouselBlock = styled.div`
   ${flex()}
@@ -32,7 +33,7 @@ const CarouselItemBlock = styled.li`
   }
 `;
 
-const ArrowBlock = styled.div`
+const ArrowBlock = styled.div<{ direction: string }>`
   ${flex()}
   right: ${(props) => (props.direction === 'prev' ? '' : 0)};
   height: 100%;
@@ -48,32 +49,41 @@ const ArrowBlock = styled.div`
   }
 `;
 
-const WeatherCarousel = ({ city }) => {
-  const scrollPos = useRef(0);
-  const carousel = useRef(null);
-  const timerId = useRef(null);
+type WeatherCarouselProps = {
+  city: City;
+};
 
-  const onScroll = () => (scrollPos.current = carousel.current.scrollLeft);
+const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
+  const scrollPos = useRef(0);
+  const timerId = useRef(0);
+  const carouselRef = useRef<HTMLUListElement>(null);
+
+  const onScroll = () => {
+    if (!carouselRef.current) return;
+    scrollPos.current = carouselRef.current.scrollLeft;
+  };
 
   const clearTimerId = () => {
     clearInterval(timerId.current);
   };
 
-  const onPointerDown = (e, direction) => {
-    timerId.current = setInterval(() => {
+  const onPointerDown = (e: React.PointerEvent, direction: string) => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    timerId.current = +setInterval(() => {
       if (
         (direction === 'next' &&
-          scrollPos.current >=
-            carousel.current.scrollWidth - carousel.current.clientWidth) ||
+          scrollPos.current >= carousel.scrollWidth - carousel.clientWidth) ||
         (direction === 'prev' && scrollPos.current <= 0)
       )
         return;
       scrollPos.current = utils.cutRange(
         scrollPos.current + (direction === 'next' ? 12 : -12),
         0,
-        carousel.current.scrollWidth - carousel.current.clientWidth,
+        carousel.scrollWidth - carousel.clientWidth,
       );
-      carousel.current.scrollLeft = scrollPos.current;
+      carousel.scrollLeft = scrollPos.current;
     }, 16);
 
     document.onpointerup = () => clearTimerId();
@@ -87,11 +97,11 @@ const WeatherCarousel = ({ city }) => {
       >
         <MdNavigateBefore />
       </ArrowBlock>
-      <CarouselListBlock onScroll={onScroll} ref={carousel}>
+      <CarouselListBlock onScroll={onScroll} ref={carouselRef}>
         {city.forecast.map((item) => (
           <CarouselItemBlock key={item.dt_txt}>
             <div className="date kor">
-              {item.dt.date.day}일 {item.dt.time.hour}시
+              {item.dt?.date.day}일 {item.dt?.time.hour}시
             </div>
             <div className="icon">{utils.toIcon(item.id)}</div>
             <div className="temp">{utils.kelToCel(item.temp.current)} ℃</div>

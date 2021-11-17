@@ -2,7 +2,12 @@ import React, { useCallback, useEffect, useReducer } from 'react';
 import WeatherMain from './main/WeatherMain';
 import WeatherSide from './side/WeatherSide';
 import { getWeatherCurrent, getWeatherForecast } from '../modules/api';
-import reducer, { initialState } from './../modules/weather';
+import reducer, {
+  City,
+  Forecast,
+  initialState,
+  Weather,
+} from '../modules/weather';
 import styled from 'styled-components';
 import * as utils from '../utils/methods';
 
@@ -24,7 +29,7 @@ const WeatherApp = () => {
     const { data: forecastData, error: forecastError } =
       await getWeatherForecast(name);
 
-    if (currentError || forecastError) {
+    if (currentError && forecastError) {
       dispatch({ type: 'ERROR', error: { currentError, forecastError } });
       alert('No search results.');
       return {
@@ -33,7 +38,7 @@ const WeatherApp = () => {
       };
     }
 
-    const weather = {
+    const weather: Weather = {
       id: currentData.weather[0].id,
       temp: {
         current: utils.kelToCel(currentData.main.temp),
@@ -48,30 +53,32 @@ const WeatherApp = () => {
       pressure: currentData.main.pressure,
     };
 
-    const forecast = forecastData.list.map((item) => ({
-      dt_txt: item.dt_txt,
-      dt: utils.dtTxtToDateAndTime(item.dt_txt),
-      id: item.weather[0].id,
-      temp: {
-        current: item.main.temp,
-      },
-      humidity: item.main.humidity,
-      wind: {
-        speed: item.wind.speed,
-        deg: item.wind.deg,
-      },
-    }));
+    const forecast = forecastData.list.map(
+      (item: any): Forecast => ({
+        dt_txt: item.dt_txt,
+        dt: utils.dtTxtToDateAndTime(item.dt_txt),
+        id: item.weather[0].id,
+        temp: {
+          current: item.main.temp,
+        },
+        humidity: item.main.humidity,
+        wind: {
+          speed: item.wind.speed,
+          deg: item.wind.deg,
+        },
+      }),
+    );
 
     return { data: { weather, forecast }, error: null };
   }, []);
 
   const onAddCity = useCallback(
-    async (str) => {
+    async (str: string) => {
       const name = utils.toCasing(str);
       if (!name || state.cities.find((city) => city.name === name)) return;
 
       const { data, error } = await loadWeatherData(name);
-      if (!data && error) return;
+      if (!data || error) return;
 
       dispatch({
         type: 'ADD_CITY',
@@ -88,9 +95,9 @@ const WeatherApp = () => {
   );
 
   const onRefreshCity = useCallback(
-    async (city) => {
+    async (city: City) => {
       const { data, error } = await loadWeatherData(city.name);
-      if (!data && error) return;
+      if (!data || error) return;
 
       dispatch({
         type: 'SET_CITY',
@@ -105,7 +112,7 @@ const WeatherApp = () => {
     [loadWeatherData],
   );
 
-  const onSelectCity = useCallback((city) => {
+  const onSelectCity = useCallback((city: City) => {
     dispatch({
       type: 'SELECT_CITY',
       city,
@@ -113,7 +120,7 @@ const WeatherApp = () => {
   }, []);
 
   const onRemoveCity = useCallback(
-    (city) => {
+    (city: City) => {
       const index = Math.max(state.cities.indexOf(city), 0);
       const adjacentCity = state.cities[index + 1]
         ? state.cities[index + 1]
@@ -131,7 +138,7 @@ const WeatherApp = () => {
   );
 
   const onInsertCity = useCallback(
-    (city, toIndex) => {
+    (city: City, toIndex: number) => {
       let cities = state.cities.filter((item) => item.name !== city.name);
       cities = [...cities.slice(0, toIndex), city, ...cities.slice(toIndex)];
       dispatch({ type: 'SET_CITIES', cities });
@@ -139,7 +146,7 @@ const WeatherApp = () => {
     [state.cities],
   );
 
-  const onToggleMarkCity = useCallback((city) => {
+  const onToggleMarkCity = useCallback((city: City) => {
     dispatch({
       type: 'BOOKMARK_CITY',
       city,
@@ -148,7 +155,10 @@ const WeatherApp = () => {
   }, []);
 
   useEffect(() => {
-    const cities = JSON.parse(localStorage.getItem('marked_cities'));
+    const json = localStorage.getItem('marked_cities');
+    if (!json) return;
+
+    const cities = JSON.parse(json);
     dispatch({ type: 'SET_CITIES', cities });
   }, []);
 

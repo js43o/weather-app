@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import WeatherMainForecast from './WeatherCarousel';
 import styled, { keyframes } from 'styled-components';
 import { AiOutlineLoading } from 'react-icons/ai';
@@ -7,9 +7,9 @@ import { MdRefresh } from 'react-icons/md';
 import * as utils from '../../utils/methods';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
-import { useEffect } from 'react/cjs/react.development';
+import { City } from '../../modules/weather';
 
-const WeatherMainBlock = styled.div`
+const WeatherMainBlock = styled.div<{ color?: string }>`
   ${flex('column')};
   flex-grow: 2;
   width: 60%;
@@ -77,7 +77,7 @@ const SubInfoItemBlock = styled.div`
   }
 `;
 
-const WindArrow = styled(ImArrowUp)`
+const WindArrow = styled(ImArrowUp)<{ deg: number }>`
   margin-right: 0.25rem;
   transform: rotate(${(props) => props.deg + 180 + 'deg'});
 `;
@@ -112,20 +112,13 @@ const RefreshButton = styled(MdRefresh)`
   }
 `;
 
-const WeatherMain = ({ loading, city, onRefreshCity }) => {
-  useEffect(() => {
-    if (!city) return;
-    console.log('rerendering', city.recentUpdate);
-  });
+type WeatherMainProps = {
+  loading: boolean;
+  city: City | null;
+  onRefreshCity: (city: City) => void;
+};
 
-  useEffect(() => {
-    console.log('city is change');
-  }, [city]);
-
-  const onClick = () => {
-    onRefreshCity(city);
-  };
-
+const WeatherMain = ({ loading, city, onRefreshCity }: WeatherMainProps) => {
   if (loading)
     return (
       <WeatherMainBlock>
@@ -135,6 +128,10 @@ const WeatherMain = ({ loading, city, onRefreshCity }) => {
     );
 
   if (!city) return <WeatherMainBlock>Select the city.</WeatherMainBlock>;
+
+  const onClick = () => {
+    onRefreshCity(city);
+  };
 
   const {
     name,
