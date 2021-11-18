@@ -11,6 +11,8 @@ App.test.js
 
 # production
 /build
+/scripts
+/config
 
 # misc
 .DS_Store
@@ -25,6 +27,3 @@ yarn-error.log*
 
 #API KEY
 .env
-
-/scripts
-/config
