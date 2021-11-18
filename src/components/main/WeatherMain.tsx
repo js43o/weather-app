@@ -7,7 +7,7 @@ import { MdRefresh } from 'react-icons/md';
 import * as utils from '../../utils/methods';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
-import { City } from '../../modules/weather';
+import type { City } from '../../modules/weather';
 
 const WeatherMainBlock = styled.div<{ color?: string }>`
   ${flex('column')};

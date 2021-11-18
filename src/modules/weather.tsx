@@ -1,6 +1,6 @@
-import { dt } from '../utils/methods';
+import type { dt } from '../utils/methods';
 
-export type Weather = {
+export type CurrentWeather = {
   id: string;
   temp: {
     current: string;
@@ -15,9 +15,7 @@ export type Weather = {
   pressure: number;
 };
 
-// { id: any; temp: { current: string; min: string; max: string; }; humidity: any; wind: { speed: any; deg: any; }; pressure: any; }
-
-export type Forecast = {
+export type ForecastWeather = {
   dt_txt: string;
   dt: dt | null;
   id: string;
@@ -33,15 +31,15 @@ export type Forecast = {
 
 export type City = {
   name: string;
-  weather: Weather;
-  forecast: Forecast[];
+  weather: CurrentWeather;
+  forecast: ForecastWeather[];
   marked: boolean;
   recentUpdate: number;
 };
 
-type WeatherError = {
-  currentError: Error;
-  forecastError: Error;
+export type WeatherError = {
+  currentError: Error | null;
+  forecastError: Error | null;
 };
 
 type State = {

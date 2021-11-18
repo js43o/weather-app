@@ -7,7 +7,7 @@ import Button from '../../lib/Button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
 import * as utils from '../../utils/methods';
-import { City } from '../../modules/weather';
+import type { City } from '../../modules/weather';
 
 const WeatherSideBlock = styled.div<{ opened: boolean }>`
   ${flex('column', 'auto', 'auto')}

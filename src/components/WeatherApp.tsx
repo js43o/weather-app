@@ -1,12 +1,17 @@
 import React, { useCallback, useEffect, useReducer } from 'react';
 import WeatherMain from './main/WeatherMain';
 import WeatherSide from './side/WeatherSide';
-import { getWeatherCurrent, getWeatherForecast } from '../modules/api';
+import {
+  CurrentWeatherData,
+  ForecastWeatherDataItem,
+  getWeatherCurrent,
+  getWeatherForecast,
+} from '../modules/api';
 import reducer, {
   City,
-  Forecast,
   initialState,
-  Weather,
+  CurrentWeather,
+  ForecastWeather,
 } from '../modules/weather';
 import styled from 'styled-components';
 import * as utils from '../utils/methods';
@@ -20,7 +25,7 @@ const WeatherAppBlock = styled.div`
 const WeatherApp = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const loadWeatherData = useCallback(async (name) => {
+  const loadWeatherData = useCallback(async (name: string) => {
     dispatch({ type: 'LOADING' });
 
     const { data: currentData, error: currentError } = await getWeatherCurrent(
@@ -29,7 +34,7 @@ const WeatherApp = () => {
     const { data: forecastData, error: forecastError } =
       await getWeatherForecast(name);
 
-    if (currentError && forecastError) {
+    if (!currentData || currentError || !forecastData || forecastError) {
       dispatch({ type: 'ERROR', error: { currentError, forecastError } });
       alert('No search results.');
       return {
@@ -38,23 +43,25 @@ const WeatherApp = () => {
       };
     }
 
-    const weather: Weather = {
-      id: currentData.weather[0].id,
+    const weather: CurrentWeather = {
+      id: (currentData as CurrentWeatherData).weather[0].id,
       temp: {
-        current: utils.kelToCel(currentData.main.temp),
-        min: utils.kelToCel(currentData.main.temp_min),
-        max: utils.kelToCel(currentData.main.temp_max),
+        current: utils.kelToCel((currentData as CurrentWeatherData).main.temp),
+        min: utils.kelToCel((currentData as CurrentWeatherData).main.temp_min),
+        max: utils.kelToCel((currentData as CurrentWeatherData).main.temp_max),
       },
-      humidity: currentData.main.humidity,
+      humidity: (currentData as CurrentWeatherData).main.humidity,
       wind: {
-        speed: currentData.wind.speed,
-        deg: currentData.wind.deg,
+        speed: (currentData as CurrentWeatherData).wind.speed,
+        deg: (currentData as CurrentWeatherData).wind.deg,
       },
-      pressure: currentData.main.pressure,
+      pressure: (currentData as CurrentWeatherData).main.pressure,
     };
 
-    const forecast = forecastData.list.map(
-      (item: any): Forecast => ({
+    const forecast: ForecastWeather[] = (
+      forecastData as { list: ForecastWeatherDataItem[] }
+    ).list.map(
+      (item: ForecastWeatherDataItem): ForecastWeather => ({
         dt_txt: item.dt_txt,
         dt: utils.dtTxtToDateAndTime(item.dt_txt),
         id: item.weather[0].id,
@@ -69,7 +76,13 @@ const WeatherApp = () => {
       }),
     );
 
-    return { data: { weather, forecast }, error: null };
+    return {
+      data: {
+        weather,
+        forecast,
+      },
+      error: null,
+    };
   }, []);
 
   const onAddCity = useCallback(
@@ -77,15 +90,15 @@ const WeatherApp = () => {
       const name = utils.toCasing(str);
       if (!name || state.cities.find((city) => city.name === name)) return;
 
-      const { data, error } = await loadWeatherData(name);
-      if (!data || error) return;
+      const result = await loadWeatherData(name);
+      if (!result?.data || result?.error) return;
 
       dispatch({
         type: 'ADD_CITY',
         city: {
           name,
-          weather: data.weather,
-          forecast: data.forecast,
+          weather: result.data.weather,
+          forecast: result.data.forecast,
           marked: false,
           recentUpdate: Date.now(),
         },
@@ -96,15 +109,15 @@ const WeatherApp = () => {
 
   const onRefreshCity = useCallback(
     async (city: City) => {
-      const { data, error } = await loadWeatherData(city.name);
-      if (!data || error) return;
+      const result = await loadWeatherData(city.name);
+      if (!result?.data || result?.error) return;
 
       dispatch({
         type: 'SET_CITY',
         city: {
           ...city,
-          weather: data.weather,
-          forecast: data.forecast,
+          weather: result.data.weather,
+          forecast: result.data.forecast,
           recentUpdate: Date.now(),
         },
       });

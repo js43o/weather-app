@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
 import * as utils from '../../utils/methods';
 import flex from '../../utils/styles';
-import { City } from '../../modules/weather';
+import type { City } from '../../modules/weather';
 
 const WeatherCarouselBlock = styled.div`
   ${flex()}

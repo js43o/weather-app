@@ -5,7 +5,7 @@ import flex from '../../utils/styles';
 import { BsStar, BsStarFill } from 'react-icons/bs';
 import { FaTrashAlt } from 'react-icons/fa';
 import * as utils from '../../utils/methods';
-import { City } from '../../modules/weather';
+import type { City } from '../../modules/weather';
 
 const WeatherItemBlock = styled.li<{ isSelected: boolean }>`
   ${flex('row', 'space-between')}
