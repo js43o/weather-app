@@ -28,11 +28,10 @@ export type dt = {
     second: string;
   };
 };
-export const dtTxtToDateAndTime = (dt_txt: string) => {
-  const matchFour = dt_txt.match(/\d{4}/g);
-  const matchTwo = dt_txt.match(/\d{2}/g);
 
-  if (!matchTwo || !matchFour) return null;
+export const dtTxtToDateAndTime = (dt_txt: string) => {
+  const matchFour = dt_txt.match(/\d{4}/g) as RegExpMatchArray;
+  const matchTwo = dt_txt.match(/\d{2}/g) as RegExpMatchArray;
 
   const res: dt = {
     date: {

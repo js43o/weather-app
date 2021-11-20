@@ -17,7 +17,7 @@ export type CurrentWeather = {
 
 export type ForecastWeather = {
   dt_txt: string;
-  dt: dt | null;
+  dt: dt;
   id: string;
   temp: {
     current: number;
@@ -56,7 +56,7 @@ type Action =
   | { type: 'SET_CITY'; city: City }
   | { type: 'SELECT_CITY'; city: City }
   | { type: 'REMOVE_CITY'; city: City; adjacentCity: City | null }
-  | { type: 'BOOKMARK_CITY'; city: City; marked: boolean }
+  | { type: 'TOGGLE_MARK'; city: City; marked: boolean }
   | { type: 'SET_CITIES'; cities: City[] };
 
 export const initialState: State = {
@@ -111,7 +111,7 @@ const reducer = (state: State, action: Action) => {
             ? action.adjacentCity
             : state.currentCity,
       };
-    case 'BOOKMARK_CITY':
+    case 'TOGGLE_MARK':
       return {
         ...state,
         cities: state.cities.map((city) =>

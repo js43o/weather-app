@@ -67,7 +67,7 @@ const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
     clearInterval(timerId.current);
   };
 
-  const onPointerDown = (e: React.PointerEvent, direction: string) => {
+  const onPointerDown = (direction: string) => {
     const carousel = carouselRef.current;
     if (!carousel) return;
 
@@ -92,7 +92,7 @@ const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
     <WeatherCarouselBlock>
       <ArrowBlock
         direction="prev"
-        onPointerDown={(e) => onPointerDown(e, 'prev')}
+        onPointerDown={() => onPointerDown('prev')}
         onPointerLeave={clearTimerId}
       >
         <MdNavigateBefore />
@@ -101,7 +101,7 @@ const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
         {city.forecast.map((item) => (
           <CarouselItemBlock key={item.dt_txt}>
             <div className="date kor">
-              {item.dt?.date.day}일 {item.dt?.time.hour}시
+              {item.dt.date.day}일 {item.dt.time.hour}시
             </div>
             <div className="icon">{utils.toIcon(item.id)}</div>
             <div className="temp">{utils.kelToCel(item.temp.current)} ℃</div>
@@ -113,7 +113,7 @@ const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
       </CarouselListBlock>
       <ArrowBlock
         direction="next"
-        onPointerDown={(e) => onPointerDown(e, 'next')}
+        onPointerDown={() => onPointerDown('next')}
         onPointerLeave={clearTimerId}
       >
         <MdNavigateNext />

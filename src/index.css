@@ -14,6 +14,7 @@ body,
 
 body {
   font-family: 'Montserrat', sans-serif;
+  cursor: default;
 }
 
 .kor {

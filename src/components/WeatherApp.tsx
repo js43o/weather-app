@@ -4,8 +4,7 @@ import WeatherSide from './side/WeatherSide';
 import {
   CurrentWeatherData,
   ForecastWeatherDataItem,
-  getWeatherCurrent,
-  getWeatherForecast,
+  getAllWeather,
 } from '../modules/api';
 import reducer, {
   City,
@@ -28,13 +27,12 @@ const WeatherApp = () => {
   const loadWeatherData = useCallback(async (name: string) => {
     dispatch({ type: 'LOADING' });
 
-    const { data: currentData, error: currentError } = await getWeatherCurrent(
-      name,
-    );
-    const { data: forecastData, error: forecastError } =
-      await getWeatherForecast(name);
+    const {
+      resultCurrent: { data: currentData, error: currentError },
+      resultForecast: { data: forecastData, error: forecastError },
+    } = await getAllWeather(name);
 
-    if (!currentData || currentError || !forecastData || forecastError) {
+    if (!currentData || !forecastData) {
       dispatch({ type: 'ERROR', error: { currentError, forecastError } });
       alert('No search results.');
       return {
@@ -43,19 +41,20 @@ const WeatherApp = () => {
       };
     }
 
+    const current = currentData as CurrentWeatherData;
     const weather: CurrentWeather = {
-      id: (currentData as CurrentWeatherData).weather[0].id,
+      id: current.weather[0].id,
       temp: {
-        current: utils.kelToCel((currentData as CurrentWeatherData).main.temp),
-        min: utils.kelToCel((currentData as CurrentWeatherData).main.temp_min),
-        max: utils.kelToCel((currentData as CurrentWeatherData).main.temp_max),
+        current: utils.kelToCel(current.main.temp),
+        min: utils.kelToCel(current.main.temp_min),
+        max: utils.kelToCel(current.main.temp_max),
       },
-      humidity: (currentData as CurrentWeatherData).main.humidity,
+      humidity: current.main.humidity,
       wind: {
-        speed: (currentData as CurrentWeatherData).wind.speed,
-        deg: (currentData as CurrentWeatherData).wind.deg,
+        speed: current.wind.speed,
+        deg: current.wind.deg,
       },
-      pressure: (currentData as CurrentWeatherData).main.pressure,
+      pressure: current.main.pressure,
     };
 
     const forecast: ForecastWeather[] = (
@@ -90,15 +89,15 @@ const WeatherApp = () => {
       const name = utils.toCasing(str);
       if (!name || state.cities.find((city) => city.name === name)) return;
 
-      const result = await loadWeatherData(name);
-      if (!result?.data || result?.error) return;
+      const { data, error } = await loadWeatherData(name);
+      if (!data || error) return;
 
       dispatch({
         type: 'ADD_CITY',
         city: {
           name,
-          weather: result.data.weather,
-          forecast: result.data.forecast,
+          weather: data.weather,
+          forecast: data.forecast,
           marked: false,
           recentUpdate: Date.now(),
         },
@@ -109,15 +108,15 @@ const WeatherApp = () => {
 
   const onRefreshCity = useCallback(
     async (city: City) => {
-      const result = await loadWeatherData(city.name);
-      if (!result?.data || result?.error) return;
+      const { data, error } = await loadWeatherData(city.name);
+      if (!data || error) return;
 
       dispatch({
         type: 'SET_CITY',
         city: {
           ...city,
-          weather: result.data.weather,
-          forecast: result.data.forecast,
+          weather: data.weather,
+          forecast: data.forecast,
           recentUpdate: Date.now(),
         },
       });
@@ -161,7 +160,7 @@ const WeatherApp = () => {
 
   const onToggleMarkCity = useCallback((city: City) => {
     dispatch({
-      type: 'BOOKMARK_CITY',
+      type: 'TOGGLE_MARK',
       city,
       marked: !city.marked,
     });

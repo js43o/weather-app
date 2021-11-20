@@ -48,27 +48,16 @@ type Response = {
 async function processPromise(promise: Promise<Response>): Promise<Response> {
   try {
     const response = await promise;
-    console.log(response);
-
-    const res: Response = {
+    return {
       data: response.data,
       error: null,
     };
-    return res;
   } catch (e) {
-    if (e instanceof Error) {
-      const res: Response = {
-        data: null,
-        error: e,
-      };
-      return res;
-    }
-    const res: Response = { data: null, error: null };
-    return res;
+    return { data: null, error: e as Error };
   }
 }
 
-export const getWeatherCurrent = async (cityName: string) => {
+export const getCurrentWeather = async (cityName: string) => {
   const result = await processPromise(
     axios.get(
       `http://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}`,
@@ -77,11 +66,17 @@ export const getWeatherCurrent = async (cityName: string) => {
   return result;
 };
 
-export const getWeatherForecast = async (cityName: string) => {
+export const getForecastWeather = async (cityName: string) => {
   const result = await processPromise(
     axios.get(
       `http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${API_KEY}`,
     ),
   );
   return result;
+};
+
+export const getAllWeather = async (cityName: string) => {
+  const resultCurrent = await getCurrentWeather(cityName);
+  const resultForecast = await getForecastWeather(cityName);
+  return { resultCurrent, resultForecast };
 };
