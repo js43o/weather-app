@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
@@ -6,6 +6,9 @@ import { BsStar, BsStarFill } from 'react-icons/bs';
 import { FaTrashAlt } from 'react-icons/fa';
 import * as utils from '../../utils/methods';
 import type { City } from '../../modules/weather';
+import { RootState } from 'modules';
+import useCityActions from 'hooks/useCityActions';
+import { useSelector } from 'react-redux';
 
 const WeatherItemBlock = styled.li<{ isSelected: boolean }>`
   ${flex('row', 'space-between')}
@@ -87,19 +90,12 @@ const RemovalBlock = styled.div`
 type WeatherItemProps = {
   city: City;
   isSelected: boolean;
-  onSelectCity: (city: City) => void;
-  onRemoveCity: (city: City) => void;
-  onToggleMarkCity: (city: City) => void;
-  onPointerDown: (e: React.PointerEvent<HTMLDivElement>, city: City) => void;
 };
 
-const WeatherItem = ({
-  city,
-  isSelected,
-  onRemoveCity,
-  onToggleMarkCity,
-  onPointerDown,
-}: WeatherItemProps) => {
+const WeatherItem = ({ city, isSelected }: WeatherItemProps) => {
+  const { cities } = useSelector((state: RootState) => state.weather);
+  const { onSelectCity, onInsertCity, onRemoveCity, onToggleMarkCity } =
+    useCityActions();
   const {
     name,
     weather: {
@@ -107,6 +103,57 @@ const WeatherItem = ({
       temp: { min, max },
     },
   } = city;
+
+  const onPointerDown = useCallback(
+    (e_down: React.PointerEvent<HTMLDivElement>, city: City) => {
+      // onHold event
+      // eslint-disable-next-line
+      let timerId = setTimeout(() => {
+        const target = e_down.target as HTMLDivElement;
+        const item = target.closest('.block') as HTMLLIElement;
+
+        const shiftY = e_down.clientY - item.getBoundingClientRect().top;
+        const width = item.getBoundingClientRect().width;
+        const height = item.getBoundingClientRect().height + 8;
+        let y = e_down.clientY - shiftY - 8;
+
+        item.classList.add('grabbed');
+        item.style.position = 'fixed';
+        item.style.top = `${y}px`;
+        item.style.width = `${width}px`;
+
+        document.onpointermove = (e_move) => {
+          y = e_move.clientY - shiftY - 8;
+          item.style.top = `${y}px`;
+        };
+
+        document.onpointerup = () => {
+          const index = utils.cutRange(
+            Math.floor(y / height),
+            0,
+            cities.length - 1,
+          );
+
+          if (index !== cities.indexOf(city)) onInsertCity(city, index);
+
+          item.classList.remove('grabbed');
+          item.style.position = '';
+          item.style.top = '';
+          item.style.width = '';
+
+          document.onpointermove = null;
+          document.onpointerup = null;
+        };
+      }, 500);
+      // onClick event
+      document.onpointerup = () => {
+        clearTimeout(timerId);
+        onSelectCity(city);
+        document.onpointerup = null;
+      };
+    },
+    [cities, onInsertCity, onSelectCity],
+  );
 
   return (
     <WeatherItemBlock className="block" isSelected={isSelected}>

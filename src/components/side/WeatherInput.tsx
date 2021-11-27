@@ -4,6 +4,9 @@ import { MdOutlineAdd, MdOutlineClose } from 'react-icons/md';
 import Button from '../../lib/Button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
+import useAddCity from 'hooks/useAddCity';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'modules';
 
 const WeatherInputBlock = styled.div`
   ${flex('row')}
@@ -57,16 +60,14 @@ const CloseButton = styled(Button)`
 `;
 
 type WeatherInputProps = {
-  loading: boolean;
-  onAddCity: (str: string) => void;
   onToggleOpen: () => void;
 };
 
-const WeatherInput = ({
-  loading,
-  onAddCity,
-  onToggleOpen,
-}: WeatherInputProps) => {
+const WeatherInput = ({ onToggleOpen }: WeatherInputProps) => {
+  const { loading } = useSelector((state: RootState) => state.weather);
+  const dispatch = useDispatch();
+  const onAddCity = useAddCity();
+
   const [input, setInput] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -76,7 +77,7 @@ const WeatherInput = ({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onAddCity(input);
+    dispatch(onAddCity(input));
     setInput('');
   };
 

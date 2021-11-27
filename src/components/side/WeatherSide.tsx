@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import WeatherInput from './WeatherInput';
 import WeatherItem from './WeatherItem';
 import styled from 'styled-components';
@@ -6,8 +7,7 @@ import { MdOutlineSearch } from 'react-icons/md';
 import Button from '../../lib/Button';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
-import * as utils from '../../utils/methods';
-import type { City } from '../../modules/weather';
+import { RootState } from 'modules';
 
 const WeatherSideBlock = styled.div<{ opened: boolean }>`
   ${flex('column', 'auto', 'auto')}
@@ -54,82 +54,13 @@ const SearchBlock = styled(Button)`
   }
 `;
 
-type WeatherSideProps = {
-  loading: boolean;
-  currentCity: City | null;
-  cities: City[];
-  onAddCity: (str: string) => Promise<void>;
-  onSelectCity: (city: City) => void;
-  onRemoveCity: (city: City) => void;
-  onInsertCity: (city: City, toIndex: number) => void;
-  onToggleMarkCity: (city: City) => void;
-};
-
-const WeatherSide = ({
-  loading,
-  currentCity,
-  cities,
-  onAddCity,
-  onSelectCity,
-  onRemoveCity,
-  onInsertCity,
-  onToggleMarkCity,
-}: WeatherSideProps) => {
+const WeatherSide = () => {
+  const { currentCity, cities } = useSelector(
+    (state: RootState) => state.weather,
+  );
   const [open, setOpen] = useState(false);
-  const listRef = useRef(null);
 
   const onToggleOpen = useCallback(() => setOpen(!open), [open]);
-
-  const onPointerDown = useCallback(
-    (e_down: React.PointerEvent<HTMLDivElement>, city: City) => {
-      // onHold event
-      // eslint-disable-next-line
-      let timerId = setTimeout(() => {
-        const target = e_down.target as HTMLDivElement;
-        const item = target.closest('.block') as HTMLLIElement;
-
-        const shiftY = e_down.clientY - item.getBoundingClientRect().top;
-        const width = item.getBoundingClientRect().width;
-        const height = item.getBoundingClientRect().height + 8;
-        let y = e_down.clientY - shiftY - 8;
-
-        item.classList.add('grabbed');
-        item.style.position = 'fixed';
-        item.style.top = `${y}px`;
-        item.style.width = `${width}px`;
-
-        document.onpointermove = (e_move) => {
-          y = e_move.clientY - shiftY - 8;
-          item.style.top = `${y}px`;
-        };
-
-        document.onpointerup = () => {
-          const index = utils.cutRange(
-            Math.floor(y / height),
-            0,
-            cities.length - 1,
-          );
-
-          if (index !== cities.indexOf(city)) onInsertCity(city, index);
-
-          item.classList.remove('grabbed');
-          item.style.position = '';
-          item.style.top = '';
-          item.style.width = '';
-
-          document.onpointermove = null;
-          document.onpointerup = null;
-        };
-      }, 500);
-      // onClick event
-      document.onpointerup = () => {
-        clearTimeout(timerId);
-        onSelectCity(city);
-        document.onpointerup = null;
-      };
-    },
-    [cities, onInsertCity],
-  );
 
   return (
     <>
@@ -137,13 +68,9 @@ const WeatherSide = ({
         <MdOutlineSearch />
       </SearchBlock>
       <WeatherSideBlock opened={open}>
-        <WeatherInput
-          loading={loading}
-          onAddCity={onAddCity}
-          onToggleOpen={onToggleOpen}
-        />
+        <WeatherInput onToggleOpen={onToggleOpen} />
         {cities ? (
-          <WeatherList ref={listRef}>
+          <WeatherList>
             {cities.map((city) => (
               <WeatherItem
                 key={city.name}
@@ -151,10 +78,6 @@ const WeatherSide = ({
                 isSelected={
                   currentCity ? currentCity.name === city.name : false
                 }
-                onSelectCity={onSelectCity}
-                onRemoveCity={onRemoveCity}
-                onToggleMarkCity={onToggleMarkCity}
-                onPointerDown={onPointerDown}
               />
             ))}
           </WeatherList>

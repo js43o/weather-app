@@ -11,8 +11,9 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "declaration": true,
+    "baseUrl": "src"
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }

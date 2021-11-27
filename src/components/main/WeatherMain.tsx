@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import WeatherMainForecast from './WeatherCarousel';
 import styled, { keyframes } from 'styled-components';
 import { AiOutlineLoading } from 'react-icons/ai';
@@ -7,7 +8,8 @@ import { MdRefresh } from 'react-icons/md';
 import * as utils from '../../utils/methods';
 import palette from '../../utils/palette';
 import flex from '../../utils/styles';
-import type { City } from '../../modules/weather';
+import { RootState } from 'modules';
+import useRefreshCity from 'hooks/useRefreshCity';
 
 const WeatherMainBlock = styled.div<{ color?: string }>`
   ${flex('column')};
@@ -112,13 +114,13 @@ const RefreshButton = styled(MdRefresh)`
   }
 `;
 
-type WeatherMainProps = {
-  loading: boolean;
-  city: City | null;
-  onRefreshCity: (city: City) => void;
-};
+const WeatherMain = () => {
+  const { loading, currentCity } = useSelector(
+    (state: RootState) => state.weather,
+  );
+  const dispatch = useDispatch();
+  const onRefreshCity = useRefreshCity();
 
-const WeatherMain = ({ loading, city, onRefreshCity }: WeatherMainProps) => {
   if (loading)
     return (
       <WeatherMainBlock>
@@ -127,11 +129,8 @@ const WeatherMain = ({ loading, city, onRefreshCity }: WeatherMainProps) => {
       </WeatherMainBlock>
     );
 
-  if (!city) return <WeatherMainBlock>Select the city.</WeatherMainBlock>;
-
-  const onClick = () => {
-    onRefreshCity(city);
-  };
+  if (!currentCity)
+    return <WeatherMainBlock>Select the city.</WeatherMainBlock>;
 
   const {
     name,
@@ -143,14 +142,14 @@ const WeatherMain = ({ loading, city, onRefreshCity }: WeatherMainProps) => {
       pressure,
     },
     recentUpdate,
-  } = city;
+  } = currentCity;
 
   return (
     <WeatherMainBlock color={utils.toColor(id)}>
       <MainInfoBlock>
         <div className="recent">
           {utils.secToText(recentUpdate)}
-          <RefreshButton onClick={onClick} />
+          <RefreshButton onClick={() => dispatch(onRefreshCity(currentCity))} />
         </div>
         <div className="city">{name}</div>
         <div className="icon">{utils.toIcon(id)}</div>
@@ -174,7 +173,7 @@ const WeatherMain = ({ loading, city, onRefreshCity }: WeatherMainProps) => {
           <div>{pressure} hPa</div>
         </SubInfoItemBlock>
       </SubInfoBlock>
-      <WeatherMainForecast city={city} />
+      <WeatherMainForecast />
     </WeatherMainBlock>
   );
 };

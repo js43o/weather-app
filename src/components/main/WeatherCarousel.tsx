@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import { MdNavigateBefore, MdNavigateNext } from 'react-icons/md';
 import * as utils from '../../utils/methods';
 import flex from '../../utils/styles';
-import type { City } from '../../modules/weather';
+import { useSelector } from 'react-redux';
+import { RootState } from 'modules';
 
 const WeatherCarouselBlock = styled.div`
   ${flex()}
@@ -49,11 +50,11 @@ const ArrowBlock = styled.div<{ direction: string }>`
   }
 `;
 
-type WeatherCarouselProps = {
-  city: City;
-};
+const WeatherCarousel = () => {
+  const { currentCity } = useSelector((state: RootState) => state.weather);
 
-const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
+  if (!currentCity) return null;
+
   const scrollPos = useRef(0);
   const timerId = useRef(0);
   const carouselRef = useRef<HTMLUListElement>(null);
@@ -88,6 +89,7 @@ const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
 
     document.onpointerup = () => clearTimerId();
   };
+
   return (
     <WeatherCarouselBlock>
       <ArrowBlock
@@ -98,7 +100,7 @@ const WeatherCarousel = ({ city }: WeatherCarouselProps) => {
         <MdNavigateBefore />
       </ArrowBlock>
       <CarouselListBlock onScroll={onScroll} ref={carouselRef}>
-        {city.forecast.map((item) => (
+        {currentCity.forecast.map((item) => (
           <CarouselItemBlock key={item.dt_txt}>
             <div className="date kor">
               {item.dt.date.day}일 {item.dt.time.hour}시
