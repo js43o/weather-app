@@ -1,3 +1,4 @@
+import { ActionType, createAction, createReducer } from 'typesafe-actions';
 import type { dt } from '../utils/methods';
 
 export type CurrentWeather = {
@@ -42,147 +43,117 @@ export type WeatherError = {
   forecastError: Error | null;
 };
 
-// 액션 타입 리터럴
-const LOADING = 'LOADING' as const;
-const ERROR = 'ERROR' as const;
-const ADD_CITY = 'ADD_CITY' as const;
-const SET_CITY = 'SET_CITY' as const;
-const SELECT_CITY = 'SELECT_CITY' as const;
-const REMOVE_CITY = 'REMOVE_CITY' as const;
-const TOGGLE_MARK = 'TOGGLE_MARK' as const;
-const SET_CITIES = 'SET_CITIES' as const;
+const LOADING = 'LOADING';
+const ERROR = 'ERROR';
+const ADD_CITY = 'ADD_CITY';
+const SET_CITY = 'SET_CITY';
+const SELECT_CITY = 'SELECT_CITY';
+const REMOVE_CITY = 'REMOVE_CITY';
+const TOGGLE_MARK = 'TOGGLE_MARK';
+const SET_CITIES = 'SET_CITIES';
 
-// 액션 생성 함수
-export const loading = () => ({ type: LOADING });
-export const error = (error: WeatherError | null) => ({
-  type: ERROR,
-  payload: { error },
-});
-export const addCity = (city: City) => ({ type: ADD_CITY, payload: { city } });
-export const setCity = (city: City) => ({ type: SET_CITY, payload: { city } });
-export const selectCity = (city: City) => ({
-  type: SELECT_CITY,
-  payload: { city },
-});
-export const removeCity = (city: City, adjacentCity: City | null) => ({
-  type: REMOVE_CITY,
-  payload: { city, adjacentCity },
-});
-export const toggleMark = (city: City, marked: boolean) => ({
-  type: TOGGLE_MARK,
-  payload: { city, marked },
-});
-export const setCities = (cities: City[]) => ({
-  type: SET_CITIES,
-  payload: { cities },
-});
+export const loading = createAction(LOADING)();
+export const error = createAction(ERROR, (error: WeatherError | null) => ({
+  error,
+}))();
+export const addCity = createAction(ADD_CITY, (city: City) => ({ city }))();
+export const setCity = createAction(SET_CITY, (city: City) => ({ city }))();
+export const selectCity = createAction(SELECT_CITY, (city: City) => ({
+  city,
+}))();
+export const removeCity = createAction(
+  REMOVE_CITY,
+  (city: City, adjacentCity: City | null) => ({ city, adjacentCity }),
+)();
+export const toggleMark = createAction(
+  TOGGLE_MARK,
+  (city: City, marked: boolean) => ({
+    city,
+    marked,
+  }),
+)();
+export const setCities = createAction(SET_CITIES, (cities: City[]) => ({
+  cities,
+}))();
 
-// 상태 타입
-type State = {
+type WeatherState = {
   loading: boolean;
   error: WeatherError | null;
   cities: City[];
   currentCity: City | null;
 };
 
-// 액션 타입
-export type WeatherAction =
-  | ReturnType<typeof loading>
-  | ReturnType<typeof error>
-  | ReturnType<typeof addCity>
-  | ReturnType<typeof setCity>
-  | ReturnType<typeof selectCity>
-  | ReturnType<typeof removeCity>
-  | ReturnType<typeof toggleMark>
-  | ReturnType<typeof setCities>;
+const actions = {
+  loading,
+  error,
+  addCity,
+  setCity,
+  selectCity,
+  removeCity,
+  toggleMark,
+  setCities,
+};
+export type WeatherAction = ActionType<typeof actions>;
 
-export const initialState: State = {
+const initialState: WeatherState = {
   loading: false,
   error: null,
   cities: [],
   currentCity: null,
 };
 
-const weather = (state: State = initialState, action: WeatherAction): State => {
-  switch (action.type) {
-    case 'LOADING': {
-      return {
-        ...state,
-        loading: true,
-        error: null,
-      };
-    }
-    case 'ERROR': {
-      const { error } = action.payload;
-      return {
-        ...state,
-        loading: false,
-        error,
-      };
-    }
-    case 'ADD_CITY': {
-      const { city } = action.payload;
-      return {
-        ...state,
-        loading: false,
-        cities: state.cities.concat(city),
-        currentCity: city,
-      };
-    }
-    case 'SET_CITY': {
-      const { city } = action.payload;
-      return {
-        ...state,
-        loading: false,
-        cities: state.cities.map((item) =>
-          item.name === city.name ? city : item,
-        ),
-        currentCity: city,
-      };
-    }
-    case 'SELECT_CITY': {
-      const { city } = action.payload;
-      return {
-        ...state,
-        currentCity: city,
-      };
-    }
-    case 'REMOVE_CITY': {
-      const { city, adjacentCity } = action.payload;
-      return {
-        ...state,
-        cities: state.cities.filter((item) => item.name !== city.name),
-        currentCity:
-          state.currentCity?.name === city.name
-            ? adjacentCity
-            : state.currentCity,
-      };
-    }
-    case 'TOGGLE_MARK': {
-      const { city } = action.payload;
-      return {
-        ...state,
-        cities: state.cities.map((item) =>
-          item.name === city.name
-            ? {
-                ...item,
-                marked: !item.marked,
-              }
-            : item,
-        ),
-      };
-    }
-    case 'SET_CITIES': {
-      const { cities } = action.payload;
-      return {
-        ...state,
-        cities,
-        currentCity: state.currentCity || cities[0],
-      };
-    }
-    default:
-      return state;
-  }
-};
+const weather = createReducer<WeatherState, WeatherAction>(initialState, {
+  [LOADING]: (state) => ({ ...state, loading: true, error: null }),
+  [ERROR]: (state, action) => ({
+    ...state,
+    loading: false,
+    error: action.payload.error,
+  }),
+  [ADD_CITY]: (state, action) => ({
+    ...state,
+    loading: false,
+    cities: state.cities.concat(action.payload.city),
+    currentCity: action.payload.city,
+  }),
+  [SET_CITY]: (state, action) => ({
+    ...state,
+    loading: false,
+    cities: state.cities.map((item) =>
+      item.name === action.payload.city.name ? action.payload.city : item,
+    ),
+    currentCity: action.payload.city,
+  }),
+  [SELECT_CITY]: (state, action) => ({
+    ...state,
+    currentCity: action.payload.city,
+  }),
+  [REMOVE_CITY]: (state, action) => ({
+    ...state,
+
+    cities: state.cities.filter(
+      (item) => item.name !== action.payload.city.name,
+    ),
+    currentCity:
+      state.currentCity?.name === action.payload.city.name
+        ? action.payload.adjacentCity
+        : state.currentCity,
+  }),
+  [TOGGLE_MARK]: (state, action) => ({
+    ...state,
+    cities: state.cities.map((item) =>
+      item.name === action.payload.city.name
+        ? {
+            ...item,
+            marked: !item.marked,
+          }
+        : item,
+    ),
+  }),
+  [SET_CITIES]: (state, action) => ({
+    ...state,
+    cities: action.payload.cities,
+    currentCity: state.currentCity || action.payload.cities[0],
+  }),
+});
 
 export default weather;
