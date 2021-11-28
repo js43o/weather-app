@@ -59,7 +59,6 @@ const WeatherSide = () => {
     (state: RootState) => state.weather,
   );
   const [open, setOpen] = useState(false);
-
   const onToggleOpen = useCallback(() => setOpen(!open), [open]);
 
   return (

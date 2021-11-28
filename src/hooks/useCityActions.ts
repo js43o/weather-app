@@ -10,18 +10,12 @@ import {
 import { RootState } from 'modules';
 
 export default function useCityActions() {
-  const { cities, currentCity } = useSelector(
-    (state: RootState) => state.weather,
-  );
+  const cities = useSelector((state: RootState) => state.weather.cities);
   const dispatch = useDispatch();
 
-  const onSelectCity = useCallback(
-    (city: City) => {
-      if (currentCity === city) return;
-      dispatch(selectCity(city));
-    },
-    [currentCity],
-  );
+  const onSelectCity = useCallback((city: City) => {
+    dispatch(selectCity(city));
+  }, []);
 
   const onRemoveCity = useCallback(
     (city: City) => {
