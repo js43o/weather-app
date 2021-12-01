@@ -6,6 +6,8 @@ import flex from '../../utils/styles';
 import { useSelector } from 'react-redux';
 import { RootState } from 'modules';
 
+const CAROUSE_ITEM_WIDTH = 128;
+
 const WeatherCarouselBlock = styled.div`
   ${flex()}
   position: relative;
@@ -16,12 +18,14 @@ const WeatherCarouselBlock = styled.div`
 const CarouselListBlock = styled.ul`
   ${flex('row', 'flex-start')}
   overflow-x: scroll;
+  scroll-behavior: smooth;
 `;
 
 const CarouselItemBlock = styled.li`
   ${flex('column')}
   flex-shrink: 0;
   flex-basis: 8rem;
+  min-width: ${CAROUSE_ITEM_WIDTH}px;
   padding: 0.5rem;
   margin-bottom: 1rem;
   max-width: 100%;
@@ -56,7 +60,6 @@ const WeatherCarousel = () => {
   if (!currentCity) return null;
 
   const scrollPos = useRef(0);
-  const timerId = useRef(0);
   const carouselRef = useRef<HTMLUListElement>(null);
 
   const onScroll = () => {
@@ -64,39 +67,36 @@ const WeatherCarousel = () => {
     scrollPos.current = carouselRef.current.scrollLeft;
   };
 
-  const clearTimerId = () => {
-    clearInterval(timerId.current);
-  };
-
-  const onPointerDown = (direction: string) => {
+  const onClick = (direction: string) => {
     const carousel = carouselRef.current;
+    const pos = scrollPos.current;
     if (!carousel) return;
 
-    timerId.current = +setInterval(() => {
-      if (
-        (direction === 'next' &&
-          scrollPos.current >= carousel.scrollWidth - carousel.clientWidth) ||
-        (direction === 'prev' && scrollPos.current <= 0)
-      )
-        return;
-      scrollPos.current = utils.cutRange(
-        scrollPos.current + (direction === 'next' ? 12 : -12),
-        0,
-        carousel.scrollWidth - carousel.clientWidth,
-      );
-      carousel.scrollLeft = scrollPos.current;
-    }, 16);
+    if (
+      (direction === 'next' &&
+        pos >= carousel.scrollWidth - carousel.clientWidth) ||
+      (direction === 'prev' && pos <= 0)
+    )
+      return;
 
-    document.onpointerup = () => clearTimerId();
+    const exposedItemNum = Math.floor(
+      carousel.clientWidth / CAROUSE_ITEM_WIDTH,
+    );
+
+    scrollPos.current = utils.cutRange(
+      scrollPos.current +
+        (direction === 'next'
+          ? CAROUSE_ITEM_WIDTH * exposedItemNum
+          : -CAROUSE_ITEM_WIDTH * exposedItemNum),
+      0,
+      carousel.scrollWidth - carousel.clientWidth,
+    );
+    carousel.scrollLeft = scrollPos.current;
   };
 
   return (
     <WeatherCarouselBlock>
-      <ArrowBlock
-        direction="prev"
-        onPointerDown={() => onPointerDown('prev')}
-        onPointerLeave={clearTimerId}
-      >
+      <ArrowBlock direction="prev" onClick={() => onClick('prev')}>
         <MdNavigateBefore />
       </ArrowBlock>
       <CarouselListBlock onScroll={onScroll} ref={carouselRef}>
@@ -113,11 +113,7 @@ const WeatherCarousel = () => {
           </CarouselItemBlock>
         ))}
       </CarouselListBlock>
-      <ArrowBlock
-        direction="next"
-        onPointerDown={() => onPointerDown('next')}
-        onPointerLeave={clearTimerId}
-      >
+      <ArrowBlock direction="next" onClick={() => onClick('next')}>
         <MdNavigateNext />
       </ArrowBlock>
     </WeatherCarouselBlock>
