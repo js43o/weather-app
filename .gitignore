@@ -10,7 +10,6 @@
 App.test.js
 
 # production
-/build
 /scripts
 /config
 
