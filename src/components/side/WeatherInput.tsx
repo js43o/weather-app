@@ -43,6 +43,7 @@ const SubmitButton = styled(Button)`
   &:active {
     opacity: 0.5;
   }
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 `;
 
 const CloseButton = styled(Button)`
@@ -57,6 +58,7 @@ const CloseButton = styled(Button)`
   @media (max-width: 768px) {
     display: flex;
   }
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 `;
 
 type WeatherInputProps = {
@@ -64,7 +66,7 @@ type WeatherInputProps = {
 };
 
 const WeatherInput = ({ onToggleOpen }: WeatherInputProps) => {
-  const { loading } = useSelector((state: RootState) => state.weather);
+  const loading = useSelector((state: RootState) => state.weather.loading);
   const dispatch = useDispatch();
   const onAddCity = useAddCity();
 

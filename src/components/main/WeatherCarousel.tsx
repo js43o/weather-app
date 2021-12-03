@@ -6,12 +6,10 @@ import flex from '../../utils/styles';
 import { useSelector } from 'react-redux';
 import { RootState } from 'modules';
 
-const CAROUSE_ITEM_WIDTH = 128;
-
 const WeatherCarouselBlock = styled.div`
   ${flex()}
   position: relative;
-  width: 80%;
+  width: 90%;
   margin-top: 1rem;
 `;
 
@@ -25,15 +23,18 @@ const CarouselItemBlock = styled.li`
   ${flex('column')}
   flex-shrink: 0;
   flex-basis: 8rem;
-  min-width: ${CAROUSE_ITEM_WIDTH}px;
+  max-width: 128px;
   padding: 0.5rem;
   margin-bottom: 1rem;
-  max-width: 100%;
   font-size: 1rem;
   .icon {
     font-size: 2rem;
   }
   .description {
+    font-size: 0.75rem;
+  }
+  @media (max-width: 430px) {
+    max-width: 72px;
     font-size: 0.75rem;
   }
 `;
@@ -42,7 +43,7 @@ const ArrowBlock = styled.div<{ direction: string }>`
   ${flex()}
   right: ${(props) => (props.direction === 'prev' ? '' : 0)};
   height: 100%;
-  padding: 1.5rem 0.5rem;
+  padding: 1.5rem 0;
   border-radius: ${(props) =>
     props.direction === 'prev' ? '0.5rem 0 0 0.5rem' : '0 0.5rem 0.5rem 0'};
   background: rgba(255, 255, 255, 0);
@@ -55,7 +56,9 @@ const ArrowBlock = styled.div<{ direction: string }>`
 `;
 
 const WeatherCarousel = () => {
-  const { currentCity } = useSelector((state: RootState) => state.weather);
+  const currentCity = useSelector(
+    (state: RootState) => state.weather.currentCity,
+  );
 
   if (!currentCity) return null;
 
@@ -70,6 +73,9 @@ const WeatherCarousel = () => {
   const onClick = (direction: string) => {
     const carousel = carouselRef.current;
     const pos = scrollPos.current;
+    const CAROUSE_ITEM_WIDTH =
+      document.documentElement.clientWidth > 430 ? 128 : 72;
+
     if (!carousel) return;
 
     if (

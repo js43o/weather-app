@@ -27,6 +27,7 @@ const WeatherItemBlock = styled.li<{ isSelected: boolean }>`
   &.grabbed {
     transform: scale(1.05);
   }
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 `;
 
 const ContentsBlock = styled.div`

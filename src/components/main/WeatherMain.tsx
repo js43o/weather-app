@@ -56,7 +56,7 @@ const MainInfoBlock = styled.div`
 
 const SubInfoBlock = styled.div`
   ${flex('row')};
-  width: 80%;
+  width: 90%;
   padding: 0.5rem;
   border-radius: 0.5rem;
   background: rgba(255, 255, 255, 0.25);
@@ -76,6 +76,9 @@ const SubInfoItemBlock = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  @media (max-width: 430px) {
+    font-size: 0.75rem;
   }
 `;
 
@@ -115,8 +118,9 @@ const RefreshButton = styled(MdRefresh)`
 `;
 
 const WeatherMain = () => {
-  const { loading, currentCity } = useSelector(
-    (state: RootState) => state.weather,
+  const loading = useSelector((state: RootState) => state.weather.loading);
+  const currentCity = useSelector(
+    (state: RootState) => state.weather.currentCity,
   );
   const dispatch = useDispatch();
   const onRefreshCity = useRefreshCity();
